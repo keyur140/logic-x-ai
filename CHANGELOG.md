@@ -7,7 +7,7 @@ Built from the real Groq pilot (2026-11-07 to 11-21) and the author's decisions 
 - **Harder puzzles:** hard deduction now has 4 difficulty levels (`items.HARD_LEVELS`). Level 1 is byte-identical to
   v0.2.0; levels 3 and 4 add "either/or" (proof by cases) steps. Answer keys use a fast exact truth table
   (`entailment_status_fast`) and are re-checked by the independent SAT solver (C2). Planted errors balanced per level.
-- **Lenient number reading:** last number on the FINAL line. Gate G1 has 7 new known-answer cases (36 in total).
+- **Lenient number reading:** last number on the FINAL line. Gate G1 has 7 new known-answer cases (36 in total, with the 5 error-flag cases).
 - **Thinking models:** `thinking: true` pools a model's 3 modes into one solver unit and adds a `thinking` control.
   Hidden reasoning (`<thought>` tags, e.g. Gemma 4) is stripped before scoring and before a solver sees an assistant
   reply; it is kept in the cache.

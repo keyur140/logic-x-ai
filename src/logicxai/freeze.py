@@ -20,7 +20,7 @@ from .provenance import canonical_json, sha256_file, sha256_text, utc_now
 
 ROOT_FILES = ("README.md", "LICENSE", "CITATION.cff", "requirements.txt", "pyproject.toml",
               "run.sh", "run.bat", ".env.example", ".gitignore", "CHANGELOG.md", "ISSUES.md",
-              "DEVIATIONS.md")
+              "DEVIATIONS.md", "DEVIATIONS_PILOT.md")
 DIRS = ("src", "configs", "tests", "scripts", "preregistration", "docs", "exploratory_synthetic")
 SKIP_PARTS = {"__pycache__", ".pytest_cache", "freeze"}
 SKIP_SUFFIX = (".pyc",)

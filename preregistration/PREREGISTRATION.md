@@ -9,7 +9,7 @@ ORCID: https://orcid.org/0009-0008-5261-043X
   
 *Conducted independently; not an official Brunel University London project.*
 
-**Status:** DRAFT (package v0.2.0). Not yet registered. Steps: (1) run the pilot on development items; (2) fill in the items marked `[TO FILL]`; (3) run `python -m logicxai freeze` and `python -m logicxai package`; (4) paste the freeze SHA-256 and the package SHA-256 into §6.1 and submit on OSF. The code refuses to send the registered items to any model until the freeze status is `MATCHES_FREEZE`.
+**Status:** DRAFT (package v0.2.1). Not yet registered. Steps: (1) run the pilot on development items; (2) fill in the items marked `[TO FILL]`; (3) run `python -m logicxai freeze` and `python -m logicxai package`; (4) paste the freeze SHA-256 and the package SHA-256 into §6.1 and submit on OSF. The code refuses to send the registered items to any model until the freeze status is `MATCHES_FREEZE`.
 
 ---
 
@@ -19,7 +19,7 @@ ORCID: https://orcid.org/0009-0008-5261-043X
 
 Workplace and laboratory studies disagree about who benefits most from large language models (LLMs). Some find that AI *levels* people (weaker performers gain most); others, on harder or open-ended tasks, find that AI *amplifies* the stronger. Logical reasoning ability has not been isolated as the moderator, and the proposed mechanism (stronger reasoners catch AI errors) has not been measured directly.
 
-This study tests these questions computationally, with no human participants. The "solvers" are 28 open-weight language models, each run in three reasoning modes (direct answer, brief reasoning, careful step-by-step reasoning), giving 84 solvers. Each solver's logical reasoning is measured on a logic battery. Each solver then completes matched tasks alone and with an AI assistant (Llama 3.3 70B; replication with Qwen 2.5 72B). On hard-to-verify deduction tasks the assistant makes a planted, subtle error on exactly half of the items. On easy, checkable arithmetic tasks the assistant answers normally.
+This study tests these questions computationally, with no human participants. The "solvers" are 28 open-weight language models, each run in three reasoning modes (direct answer, brief reasoning, careful step-by-step reasoning). Two models always reason at length whatever the mode prompt says ("thinking" models); their three modes are pooled into one solver, giving 80 solver units. Each solver's logical reasoning is measured on a logic battery. Each solver then completes matched tasks alone and with an AI assistant (gpt-oss-120b; replication with Gemma 4 31B). On hard-to-verify deduction tasks the assistant makes a planted, subtle error on exactly half of the items. On easy, checkable arithmetic tasks the assistant answers normally.
 
 All correct answers are computed by an exact logic engine (brute-force model checking) or by arithmetic, so scoring needs no human or AI judge.
 
@@ -59,20 +59,20 @@ Within-solver design. Each solver (model × reasoning mode) completes:
 2. **Benchmarks, alone**: FOLIO and LogiQA (convergent validity of the logic score), GSM8K (validity of the easy task). MMLU (knowledge control) is run once per model in direct mode, with logic and mathematics subjects removed so the control measures knowledge rather than reasoning.
 3. **Tasks, alone and with each assistant** (every item in every condition; language models have no memory between calls, so there are no order or carry-over effects):
    - *Easy, checkable:* multi-step arithmetic word problems with one integer answer. Assistant answers naturally.
-   - *Hard to verify:* rule-chain deduction puzzles (8 propositions, 5-step chain plus distractor rules); answer TRUE / FALSE / UNKNOWN, balanced. Assistant reply is scripted: a correct solution (clean) or a confident solution with exactly one subtle logical slip that reaches a specified wrong answer (planted error).
+   - *Hard to verify:* rule-chain deduction puzzles at four difficulty levels, 75 items each: level 1, 8 statements (4-step chain plus distractor rules); level 2, 12 statements (7-step chain); level 3, 16 statements (9-step chain with one "either/or" step, which can only be settled by checking both cases); level 4, 20 statements (11-step chain with two "either/or" steps). Answer TRUE / FALSE / UNKNOWN, balanced within each level. The levels were added after the pilot showed a ceiling (strong models ≥ 90% on level 1); the analysis averages over levels, which every solver sees equally. Assistant reply is scripted: a correct solution (clean) or a confident solution with exactly one subtle logical slip that reaches a specified wrong answer (planted error).
    - *Logical creativity (exploratory):* list up to 10 distinct valid conclusions from 4–5 premises.
    - *Catch items (known-answer check, 24 items, assisted only):* the statements give the answer outright and the assistant contradicts it. Used only for gate G6 (§5.7), never in the hypothesis tests.
 
 Assisted prompts state that the assistant "is often helpful but can make mistakes" and require the solver to end with `ASSISTANT_ERROR: YES/NO` and `FINAL: <answer>`.
 
 ### 2.4 Randomisation
-- Planted errors: exactly 50% of hard items, chosen by a seeded hash ranking within each answer type (TRUE/FALSE/UNKNOWN). The same items carry errors for both assistants.
+- Planted errors: exactly 50% of hard items, chosen by a seeded hash ranking within each difficulty level × answer type (TRUE/FALSE/UNKNOWN) block. The same items carry errors for both assistants.
 - The wrong target answer for each planted item is chosen uniformly at random (seeded) among the two incorrect options.
 - **Registered items** are generated with the master seed `20261026`. **Development items** (pilot, synthetic runs) use a separate seed `7110526`. Every run checks that no development item equals a registered item (self-check C8).
 - **Lock:** the code refuses to send registered items to any model unless the freeze status is `MATCHES_FREEZE` (every study file matches `freeze/FREEZE.json`).
 
 ### 2.5 Model settings
-Temperature 0, top-p 1, fixed seed, fixed token limits per mode (direct 64, brief 384, careful 1536, assistant 1024). Every request and response is hashed (SHA-256) and logged with the provider's reported model version. Each model has a primary route (free API or local Ollama) and a backup route; the route actually used is recorded.
+Temperature 0, top-p 1, fixed seed where the provider accepts one, fixed token limits per mode (direct 64, brief 384, careful 1536, assistant 1024; models whose hidden reasoning counts against the limit get a fixed extra allowance, listed in `configs/study.yaml`). Every request and response is hashed (SHA-256) and logged with the provider's reported model version. Hidden reasoning returned inside a reply (for example `<thought>` tags) is removed before scoring and before a solver sees an assistant reply, and is kept in the cache. Models up to about 14B parameters run locally with Ollama (exact digests recorded); larger models use free API tiers (Groq, Google AI Studio, Mistral), some with a local backup route; the route actually used is recorded per call. Cost: USD 0.
 
 ---
 
@@ -82,7 +82,7 @@ Temperature 0, top-p 1, fixed seed, fixed token limits per mode (direct 64, brie
 Registration takes place **before** any confirmatory data are collected. A pilot (first 6 models, small item counts, **development items only**) is run before registration only to check timings, parsing, and ceiling/floor effects. Pilot data are not used in confirmatory analyses. Before registration the whole pipeline was also run on synthetic (mock) models in a planted-effect world and a no-effect world (§5.9); those outputs are attached as a labelled supplementary file.
 
 ### 3.2 Data collection procedure
-`python -m logicxai run --profile full`. The full list of solver models, assistants, routes and parameter counts is in `configs/study.yaml`.
+`python -m logicxai run --profile full --until-done`. Free API tiers limit each key per day; when every key for a model has used its allowance the run pauses and continues later from the cache (several keys may rotate). A pause is not a failure and does not count toward the gate G3 limits. The full list of solver models, assistants, routes and parameter counts is in `configs/study.yaml`.
 
 ### 3.3 Sample size
 - **Solvers:** 28 models × 3 reasoning modes = 84 solvers, clustered in 28 models.
@@ -98,7 +98,7 @@ Each run also reports the minimum detectable H1 effect at 80% power from the obs
 `[TO FILL after pilot]` Re-run the simulation with pilot variance estimates and report the updated power here.
 
 ### 3.5 Stopping rule
-Data collection stops when every solver has completed every registered trial, or when a model is unavailable on all routes after 6 retries with exponential backoff (then handled as in §5.4).
+Data collection stops when every solver has completed every registered trial, or when a model is unavailable on all routes after 6 retries with exponential backoff (then handled as in §5.4). Daily-limit pauses do not stop data collection. If a model is retired by its provider during the run and has no backup route, its solver units are reported as missing (§5.4) and not replaced.
 
 ---
 
@@ -106,18 +106,19 @@ Data collection stops when every solver has completed every registered trial, or
 
 ### 4.1 Manipulated variables
 - Condition: alone vs assisted (within solver, within item).
-- Assistant: Llama 3.3 70B (primary), Qwen 2.5 72B (replication).
+- Assistant: gpt-oss-120b on Groq (primary), Gemma 4 31B on Google AI Studio (replication).
 - Assistant correctness on hard items: clean vs planted error (within solver, between items).
-- Reasoning mode: direct / brief / careful (defines solvers; also gives a within-model manipulation of reasoning).
+- Reasoning mode: direct / brief / careful (defines solvers; also gives a within-model manipulation of reasoning). For the two thinking models the three modes are pooled into one solver unit and they do not enter the within-model analyses.
+- Difficulty level of hard items: 1 to 4 (within solver, between items).
 
 ### 4.2 Measured variables
-- Correctness per trial (exact match to the engine-computed key; unparsable answers are scored incorrect).
+- Correctness per trial (exact match to the engine-computed key; unparsable answers are scored incorrect). Number answers are read leniently: the last number on the last `FINAL:` line (for example "FINAL: Tanya earned $365" is read as 365); with no `FINAL:` line, the last number in the reply.
 - Error flag (`ASSISTANT_ERROR: YES/NO`); a missing flag counts as NO.
 - For logical-creativity trials: the number of distinct valid conclusions (identity by truth table), invalid and trivial counts.
 
 ### 4.3 Indices
-- **Logic score** (moderator): equal-weighted mean of solo accuracy on syllogisms, conditionals and CRT items, in the solver's own mode; z-scored across the 84 solvers.
-- **Knowledge control:** MMLU accuracy (per model), z-scored. **Size control:** log10 parameter count, z-scored.
+- **Logic score** (moderator): equal-weighted mean of solo accuracy on syllogisms, conditionals and CRT items, in the solver's own mode; z-scored across the solver units.
+- **Knowledge control:** MMLU accuracy (per model), z-scored. **Size control:** log10 parameter count, z-scored. **Thinking control:** 1 for an always-thinking model, else 0 (included because both kinds are in the roster).
 - **H1 outcome (AI gain, planted errors):** accuracy with the assistant minus solo accuracy on the same planted-error hard items, in percentage points.
 - **H2 outcome (AI gain, easy):** accuracy with the assistant minus solo accuracy on the same easy items, in percentage points.
 - **Error detection d′** (H4 mediator): z(hit rate) − z(false-alarm rate), where hits = flags on replies whose final answer is wrong and false alarms = flags on replies whose final answer is correct, with the log-linear correction (Hautus, 1995).
@@ -129,14 +130,14 @@ Data collection stops when every solver has completed every registered trial, or
 ## 5. Analysis plan
 
 ### 5.1 Statistical models
-Unit = solver (n = 84); cluster = model (28). OLS with cluster-robust (CR1) standard errors. p-values from the wild cluster restricted bootstrap-t (Rademacher weights, 9,999 replications; Cameron, Gelbach & Miller, 2008).
+Unit = solver unit (n = 80: 26 models × 3 modes + 2 pooled thinking models); cluster = model (28). OLS with cluster-robust (CR1) standard errors. p-values from the wild cluster restricted bootstrap-t (Rademacher weights, 9,999 replications; Cameron, Gelbach & Miller, 2008).
 
-- **H1:** `gain_hard_error ~ logic_z + mmlu_z + logparams_z`. One-sided test, slope of logic_z > 0.
+- **H1:** `gain_hard_error ~ logic_z + mmlu_z + logparams_z + thinking`. One-sided test, slope of logic_z > 0.
 - **H2:** `gain_easy ~ logic_z + mmlu_z + logparams_z`. One-sided non-superiority test of H0: slope ≥ +5 against H1: slope < +5. The two one-sided tests against ±5 (TOST) are also reported, to state whether the effect is *equivalent to zero* (both bounds rejected) or *levelling* (CI entirely below 0).
 - **H4:** a-path `dprime_z ~ logic_z + covariates`; b-path `gain_hard_error ~ dprime_z + logic_z + covariates` (covariates as in H1). Indirect effect a × b; one-sided p and percentile CI from a cluster (model) bootstrap with 4,999 resamples.
 
 ### 5.2 Inference criteria
-Holm correction across H1, H2, H4 at familywise α = .05 (one-sided tests). A hypothesis is supported when its Holm-adjusted p < .05. Results with the primary assistant (Llama) decide the hypotheses. The Qwen assistant is a registered replication: a hypothesis "replicates" if the Qwen estimate has the same sign and its unadjusted p < .05.
+Holm correction across H1, H2, H4 at familywise α = .05 (one-sided tests). A hypothesis is supported when its Holm-adjusted p < .05. Results with the primary assistant (gpt-oss-120b) decide the hypotheses. The Gemma 4 assistant is a registered replication: a hypothesis "replicates" if the Gemma 4 estimate has the same sign and its unadjusted p < .05.
 
 ### 5.3 Registered secondary analyses (not in the Holm family)
 - S1–S2: H1 and H2 with adjusted (ANCOVA) scores. Reported as sensitivity analyses, labelled as biased upward when the solo score is noisy (§5.9).
@@ -159,13 +160,14 @@ Unparsable answers are scored incorrect (sensitivity analysis: excluded). Missin
 ### 5.6 Exploratory analyses
 - H3: originality gain ~ logical creativity + logic + covariates; valid-conclusion gain likewise.
 - Mode-level descriptives; family-level (model family) patterns; belief-bias effects.
+- AI gain and error detection by difficulty level (1 to 4); local vs API route.
 - **Multiverse / specification curve** for H1 and H2: every combination of outcome (gain, ANCOVA), logic definition (battery; battery + FOLIO + LogiQA; syllogisms only), covariates (none; knowledge; knowledge + size), modes (all; without direct) and assistant (72 specifications per hypothesis), with cluster-robust t-tests. Reported as the share of specifications that agree with the registered one.
 
 ### 5.7 Known-answer gates (decided before data; consequences fixed)
 
 | Gate | Check | If it fails |
 |---|---|---|
-| G1 | The answer parser reads 29 hand-written known replies correctly | The run stops |
+| G1 | The answer parser reads 36 hand-written known replies correctly (31 answers + 5 error flags, including 7 lenient number cases) | The run stops |
 | G2 | Collapse: > 90% same answer in any choice family | Solver excluded (§5.4) |
 | G3 | > 20% unparsable answers in a family, or > 10% API failures | Solver excluded (§5.4) |
 | G4 | Manipulation: every planted reply ends on its wrong target and every clean reply on the key; no leak words | Item excluded for that assistant |
@@ -211,7 +213,7 @@ Code: MIT licence. Generated items, raw replies, scored data and reports: CC BY 
 ### 6.4 Known limitations
 - Language-model solvers are not humans; the study tests whether logic amplifies AI assistance *in reasoning agents*, as a controlled model of human–AI collaboration, not a claim about people.
 - Model size, family and training data are confounded across models; the within-model reasoning-mode analysis (S6–S7) partly addresses this.
-- Free API endpoints can change and their versions cannot be pinned. Every reply is cached and hashed, the reported model version is logged per call, and Ollama model digests are recorded when the local route is used.
+- Free API endpoints can change and their versions cannot be pinned; free daily limits make data collection take several weeks. Every reply is cached and hashed, the reported model version is logged per call, and Ollama model digests are recorded when the local route is used.
 - Benchmark items may be in models' training data; for this reason the main tasks use freshly generated items.
 
 ### 6.5 Use of AI assistance

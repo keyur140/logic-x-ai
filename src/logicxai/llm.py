@@ -230,6 +230,7 @@ class LLMClient:
             raise DailyCapReached(f"{provider}/{model_id}: every key has used its free daily limit")
         delay = 2.0
         attempt = 0
+        rate_waits = 0
         while attempt < self.max_retries:
             if not slots:
                 raise DailyCapReached(f"{provider}/{model_id}: every key has used its free daily limit")
@@ -314,6 +315,16 @@ class LLMClient:
                                    "purpose": purpose, "status": "error", "key_name": key_name,
                                    "error": err, "timestamp_utc": utc_now()})
                         raise LLMError(err)
+                    short = _parse_wait(r.text) if r.status_code == 429 else None
+                    rate_waits += 1
+                    if short is not None and short <= 60 and rate_waits <= 120:
+                        # per-minute limit with a stated wait: wait exactly that, no doubling
+                        self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
+                                   "purpose": purpose, "status": "rate_wait", "key_name": key_name,
+                                   "wait_s": short, "timestamp_utc": utc_now()})
+                        time.sleep(short + 0.5)
+                        attempt -= 1
+                        continue
                     ra = r.headers.get("retry-after")
                     if ra:
                         try:
