@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.1 (2026-11-25)
+
+Built from the real Groq pilot (2026-11-07 to 11-21) and the author's decisions 15 to 21. See DEVIATIONS D6 to D12.
+
+- **Harder puzzles:** hard deduction now has 4 difficulty levels (`items.HARD_LEVELS`). Level 1 is byte-identical to
+  v0.2.0; levels 3 and 4 add "either/or" (proof by cases) steps. Answer keys use a fast exact truth table
+  (`entailment_status_fast`) and are re-checked by the independent SAT solver (C2). Planted errors balanced per level.
+- **Lenient number reading:** last number on the FINAL line. Gate G1 has 7 new known-answer cases (36 in total).
+- **Thinking models:** `thinking: true` pools a model's 3 modes into one solver unit and adds a `thinking` control.
+  Hidden reasoning (`<thought>` tags, e.g. Gemma 4) is stripped before scoring and before a solver sees an assistant
+  reply; it is kept in the cache.
+- **Free APIs over days:** several keys per provider rotate (`GROQ_API_KEY`, `_2`, `_3`, `_4`); a daily limit marks
+  that key as spent (state in the cache folder) and the run pauses with exit code 3 instead of logging failures.
+  `run --until-done` waits and continues by itself. New providers: Google AI Studio, Mistral, Cerebras.
+- **New commands:** `plan` (calls, tokens and days under the free limits); `check` is parallel with short timeouts.
+- **New profile:** `repilot` (hard items only, 4 free-API solvers, direct and careful modes); `scripts/repilot_summary.py`.
+- **Model list:** 22 local (Ollama) + 6 free-API solvers; assistants gpt-oss-120b and Gemma 4 31B.
+- **Fixes:** leak scan (C9) false alarm on item text; mediation guard; statsmodels pinned; benchmark revisions pinned.
+- Tests: 39 (was 22).
+
 ## 0.2.0 (2026-11-05)
 
 - **Primary outcome is now the gain score** for H1, H2 and H4 (DEVIATIONS D4). ANCOVA kept as sensitivity.

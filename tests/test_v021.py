@@ -117,6 +117,7 @@ def test_daily_limit_rotates_keys_then_pauses(tmp_path, monkeypatch):
     monkeypatch.setattr(LLM.requests, "post", post)
     c = LLM.LLMClient(tmp_path / "cache", tmp_path / "log.jsonl", max_retries=3)
     spec = LLM.ModelSpec("m", "groq", "model-x")
+    c._rr = -1  # round robin starts at the first key for this test
     r = c.chat(spec, [{"role": "user", "content": "2+2"}])
     assert r["text"] == "FINAL: 4" and used == ["Bearer k1", "Bearer k2"]
     state = json.loads((tmp_path / "cache" / "_budget_state.json").read_text())

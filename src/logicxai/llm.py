@@ -221,6 +221,11 @@ class LLMClient:
         send = {k: v for k, v in body.items() if not (k == "seed" and provider in NO_SEED)}
 
         slots = self._key_slots(provider, model_id)
+        if len(slots) > 1:  # spread calls over the keys (per-minute limits are per key too)
+            with self._lock:
+                self._rr = getattr(self, "_rr", 0) + 1
+                k = self._rr % len(slots)
+            slots = slots[k:] + slots[:k]
         if not slots:
             raise DailyCapReached(f"{provider}/{model_id}: every key has used its free daily limit")
         delay = 2.0
