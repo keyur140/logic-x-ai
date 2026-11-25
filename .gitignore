@@ -1,0 +1,7 @@
+.env
+.cache/
+runs/
+items_preview/
+__pycache__/
+*.pyc
+.venv/

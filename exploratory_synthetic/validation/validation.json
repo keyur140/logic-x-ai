@@ -1,0 +1,265 @@
+{
+  "what": "Pipeline validation on synthetic data. Not study results.",
+  "created_utc": "2026-11-05T19:36:23+00:00",
+  "sims_per_world": 2000,
+  "alpha": 0.05,
+  "bound_pp": 5.0,
+  "clusters": 25,
+  "items": {
+    "syllogism": 120,
+    "conditional": 80,
+    "crt": 30,
+    "mmlu": 400,
+    "hard_error": 150,
+    "easy_math": 200
+  },
+  "monte_carlo": [
+    {
+      "check": "H1",
+      "world": "ignore",
+      "true_effect": false,
+      "estimator": "gain",
+      "registered": false,
+      "reject_rate": 0.0665,
+      "mc_ci95": [
+        0.056390274107177736,
+        0.07827186685246701
+      ],
+      "mean_estimate_pp_per_sd": -0.002996875504886172,
+      "sims": 2000,
+      "verdict": "FAST T-TEST SLIGHTLY LIBERAL (registered bootstrap row decides)"
+    },
+    {
+      "check": "H1",
+      "world": "ignore",
+      "true_effect": false,
+      "estimator": "ancova",
+      "registered": false,
+      "reject_rate": 0.9925,
+      "mc_ci95": [
+        0.9876619756196671,
+        0.9954496635438278
+      ],
+      "mean_estimate_pp_per_sd": 7.88654350257024,
+      "sims": 2000,
+      "verdict": "FAIL"
+    },
+    {
+      "check": "H1",
+      "world": "constant",
+      "true_effect": false,
+      "estimator": "gain",
+      "registered": false,
+      "reject_rate": 0.0,
+      "mc_ci95": [
+        0.0,
+        0.0019171176005129348
+      ],
+      "mean_estimate_pp_per_sd": -10.04988328804996,
+      "sims": 2000,
+      "verdict": "PASS"
+    },
+    {
+      "check": "H1",
+      "world": "constant",
+      "true_effect": false,
+      "estimator": "ancova",
+      "registered": false,
+      "reject_rate": 0.679,
+      "mc_ci95": [
+        0.6582125018528509,
+        0.6991011700461656
+      ],
+      "mean_estimate_pp_per_sd": 2.847329356109731,
+      "sims": 2000,
+      "verdict": "FAIL"
+    },
+    {
+      "check": "H1",
+      "world": "amplify",
+      "true_effect": true,
+      "estimator": "gain",
+      "registered": false,
+      "reject_rate": 1.0,
+      "mc_ci95": [
+        0.9980828823994873,
+        1.0000000000000002
+      ],
+      "mean_estimate_pp_per_sd": 10.248837242677713,
+      "sims": 2000,
+      "verdict": "PASS"
+    },
+    {
+      "check": "H1",
+      "world": "amplify",
+      "true_effect": true,
+      "estimator": "ancova",
+      "registered": false,
+      "reject_rate": 0.6605,
+      "mc_ci95": [
+        0.6394561349672757,
+        0.6809284702829596
+      ],
+      "mean_estimate_pp_per_sd": 7.018860149869318,
+      "sims": 2000,
+      "verdict": "LOW POWER"
+    },
+    {
+      "check": "H1",
+      "world": "ignore",
+      "true_effect": false,
+      "estimator": "gain_wild",
+      "registered": true,
+      "reject_rate": 0.06,
+      "mc_ci95": [
+        0.0406476805246611,
+        0.0877234432030579
+      ],
+      "sims": 400,
+      "mean_estimate_pp_per_sd": null,
+      "verdict": "PASS"
+    },
+    {
+      "check": "H1",
+      "world": "constant",
+      "true_effect": false,
+      "estimator": "gain_wild",
+      "registered": true,
+      "reject_rate": 0.0,
+      "mc_ci95": [
+        0.0,
+        0.009512640599680667
+      ],
+      "sims": 400,
+      "mean_estimate_pp_per_sd": null,
+      "verdict": "PASS"
+    },
+    {
+      "check": "H1",
+      "world": "amplify",
+      "true_effect": true,
+      "estimator": "gain_wild",
+      "registered": true,
+      "reject_rate": 1.0,
+      "mc_ci95": [
+        0.9904873594003194,
+        1.0
+      ],
+      "sims": 400,
+      "mean_estimate_pp_per_sd": null,
+      "verdict": "PASS"
+    },
+    {
+      "check": "H2",
+      "world": "true slope = +5 (bound)",
+      "true_effect": true,
+      "estimator": "gain",
+      "registered": true,
+      "reject_rate": 0.0575,
+      "sims": 2000,
+      "mc_ci95": [
+        0.048120155274621886,
+        0.06857649380183206
+      ],
+      "mean_estimate_pp_per_sd": 5.0,
+      "verdict": "PASS"
+    }
+  ],
+  "pipeline_runs": {
+    "mock": {
+      "run": "20261105T193029Z-201ab2e1-mock",
+      "world": "amplify",
+      "confirmatory": {
+        "H1": {
+          "p_raw": 0.0575,
+          "p_holm": 0.0575,
+          "supported": false,
+          "estimate_pp_per_sd": 4.679902129495851,
+          "labels": [],
+          "interpretable": true
+        },
+        "H2": {
+          "p_raw": 0.0015,
+          "p_holm": 0.0045000000000000005,
+          "supported": true,
+          "estimate_pp_per_sd": -9.287101490778413,
+          "equivalent_within_bound": false,
+          "labels": [],
+          "interpretable": true
+        },
+        "H4": {
+          "p_raw": 0.0044,
+          "p_holm": 0.0088,
+          "supported": true,
+          "indirect": 17.81155385133216,
+          "labels": [],
+          "interpretable": true
+        }
+      },
+      "self_checks": {
+        "C1": "pass",
+        "C2": "pass",
+        "C3": "pass",
+        "C4": "pass",
+        "C5": "pass",
+        "C6": "pass",
+        "C7": "pass",
+        "C8": "pass",
+        "C9": "pass",
+        "C10": "pass",
+        "C11": "n/a",
+        "C12": "pass"
+      },
+      "self_checks_failed": [],
+      "excluded_units": 3
+    },
+    "mock_null": {
+      "run": "20261105T193237Z-0da35171-mock_null",
+      "world": "null",
+      "confirmatory": {
+        "H1": {
+          "p_raw": 1.0,
+          "p_holm": 1.0,
+          "supported": false,
+          "estimate_pp_per_sd": -12.927809427931003,
+          "labels": [],
+          "interpretable": true
+        },
+        "H2": {
+          "p_raw": 0.0015,
+          "p_holm": 0.0045000000000000005,
+          "supported": true,
+          "estimate_pp_per_sd": -9.287101490778413,
+          "equivalent_within_bound": false,
+          "labels": [],
+          "interpretable": true
+        },
+        "H4": {
+          "p_raw": 0.9488,
+          "p_holm": 1.0,
+          "supported": false,
+          "indirect": -2.0471184518944043,
+          "labels": [],
+          "interpretable": true
+        }
+      },
+      "self_checks": {
+        "C1": "pass",
+        "C2": "pass",
+        "C3": "pass",
+        "C4": "pass",
+        "C5": "pass",
+        "C6": "pass",
+        "C7": "pass",
+        "C8": "pass",
+        "C9": "pass",
+        "C10": "pass",
+        "C11": "n/a",
+        "C12": "pass"
+      },
+      "self_checks_failed": [],
+      "excluded_units": 3
+    }
+  },
+  "all_pass": true
+}

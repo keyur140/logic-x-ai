@@ -1,0 +1,91 @@
+# Logic x AI study (logicxai)
+# Author: KEYUR SHAILESHKUMAR PATEL
+# ORCID: https://orcid.org/0009-0008-5261-043X
+# Affiliations: 1) MSc Artificial Intelligence student, Department of Computer Science, Brunel University London, UK;
+#               2) Independent researcher
+# Note: Conducted independently; not an official Brunel University London project.
+# License: MIT (see LICENSE)
+
+# PILOT-ONLY CONFIG (2026-11-07). Not the registered study config.
+# KEYUR chose a small Groq-only pilot because OpenRouter, the Hugging Face router and
+# Ollama were not reachable from the run environment, and Groq retired the Llama models.
+# Deviations from study.yaml are listed in DEVIATIONS_PILOT.md. Development items only.
+study:
+  title: Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance
+  seed: 20261026
+  dev_seed: 7110526
+  error_rate: 0.5
+  modes:
+  - direct
+  - brief
+  - careful
+  equivalence_bound_pp: 5.0
+  primary_outcome: gain
+  alpha: 0.05
+  bootstrap_reps: 9999
+  collapse_share: 0.9
+  max_unparsed: 0.2
+  max_api_fail: 0.1
+  surface_auc_max: 0.65
+  max_tokens:
+    direct: 64
+    brief: 384
+    careful: 1536
+    assistant: 1024
+route: api
+profiles:
+  # "full" is kept only so the lock check can confirm pilot items never overlap the registered items.
+  full: {assistants: real, benchmarks: {folio: 200, gsm8k: 300, logiqa: 300, mmlu: 400}, item_set: registered, items: {catch: 24, conditional: 80, crt: 30, easy_math: 200, hard_deduction: 300, logic_creative: 40, syllogism: 120}, solvers: real}
+  pilot:
+    items:
+      syllogism: 36
+      conditional: 24
+      crt: 12
+      easy_math: 40
+      hard_deduction: 60
+      logic_creative: 8
+      catch: 12
+    benchmarks:
+      folio: 40
+      logiqa: 40
+      gsm8k: 40
+      mmlu: 80
+    solvers: real
+    assistants: real
+    item_set: dev
+benchmark_revisions:
+  folio: 04c740613c4973cdecfce8b198d12dda85828e1d
+  logiqa: fa9f9918fa81eca088805c1395d7f592f7755ae0
+  gsm8k: 740312add88f781978c0658806c59bc2815b9866
+  mmlu: c30699e8356da336a370243923dbaf21066bb9fe
+assistants:
+- alias: gpt-oss-120b
+  provider: groq
+  model_id: openai/gpt-oss-120b
+  params_b: 117
+  extra:
+    reasoning_effort: low
+  token_allowance: 512
+solvers:
+- alias: allam-2-7b
+  provider: groq
+  model_id: allam-2-7b
+  params_b: 7.0
+  family: allam
+- alias: gpt-oss-20b
+  provider: groq
+  model_id: openai/gpt-oss-20b
+  params_b: 21.0
+  family: gpt-oss
+  extra:
+    reasoning_effort: low
+  token_allowance: 512
+- alias: qwen3.8-27b
+  provider: groq
+  model_id: qwen/qwen3.8-27b
+  params_b: 27.0
+  family: qwen
+  extra:
+    reasoning_effort: none
+concurrency:
+  groq: 3

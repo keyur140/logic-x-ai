@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this study, its code or its data, please cite it as below."
+title: "Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance (Logic x AI)"
+type: software
+version: 0.2.0
+date-released: "2026-11-05"
+license: MIT
+authors:
+  - given-names: "KEYUR SHAILESHKUMAR"
+    family-names: "PATEL"
+    orcid: "https://orcid.org/0009-0008-5261-043X"
+    affiliation: "MSc Artificial Intelligence student, Department of Computer Science, Brunel University London, UK; Independent researcher"
+abstract: >-
+  A preregistered computational study testing whether logical reasoning
+  predicts who gains most from an AI assistant. 28 open-weight language
+  models in 3 reasoning modes act as solvers; an assistant AI helps them,
+  with planted errors on half of the hard items. Conducted independently;
+  not an official Brunel University London project.
+keywords:
+  - human-AI collaboration
+  - logical reasoning
+  - large language models
+  - preregistration
+  - open science

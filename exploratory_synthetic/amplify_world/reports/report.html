@@ -1,0 +1,466 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logic x AI run report</title>
+<style>
+:root{--bg:#fcfcfb;--ink:#0b0b0b;--muted:#52514e;--line:#e4e3df;--accent:#2a78d6;--warn:#fff4d6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a19;--ink:#f0efec;--muted:#c3c2b7;--line:#3a3a37;--accent:#3987e5;--warn:#3a3220}}
+:root[data-theme="dark"]{--bg:#1a1a19;--ink:#f0efec;--muted:#c3c2b7;--line:#3a3a37;--accent:#3987e5;--warn:#3a3220}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,sans-serif;max-width:920px;margin:0 auto;padding:24px 16px}
+h1{font-size:1.5rem;margin:0 0 4px} h2{font-size:1.15rem;margin-top:2rem;border-bottom:1px solid var(--line);padding-bottom:4px}
+.muted{color:var(--muted)} table{border-collapse:collapse;width:100%;font-size:.9rem}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.warn{background:var(--warn);padding:10px 12px;border-radius:6px} img{max-width:100%;height:auto}
+pre{white-space:pre-wrap;font-size:.8rem;background:rgba(127,127,127,.08);padding:10px;border-radius:6px;overflow-x:auto}
+.wrap{overflow-x:auto}
+</style></head><body>
+<h1>Who gains most from AI? Logic × AI run report</h1>
+<p class="muted">KEYUR SHAILESHKUMAR PATEL<br>ORCID: https://orcid.org/0009-0008-5261-043X<br>1) MSc Artificial Intelligence student, Department of Computer Science, Brunel University London, UK<br>2) Independent researcher<br>Conducted independently; not an official Brunel University London project.</p>
+<p class="warn"><b>TEST RUN with simulated (mock) models.</b> These numbers only check the pipeline. They are not study results.</p>
+<p>Run <b>20261105T193029Z-201ab2e1-mock</b> · profile <b>mock</b> · started 2026-11-05T19:30:29+00:00 ·
+81 solvers (27 models × reasoning modes) · primary assistant
+<b>mock-assistant-a</b></p>
+<h2>Confirmatory results (preregistered, Holm-corrected)</h2>
+<div class="wrap"><table><tr><th>Hyp.</th><th>Claim</th><th>Estimate</th><th>p (raw)</th><th>p (Holm)</th><th>Verdict</th></tr><tr><td>H1</td><td>Amplification: when the AI makes planted errors, higher-logic solvers gain more (or lose less) from the AI</td><td>4.68</td><td>0.0575</td><td>0.0575</td><td>Not supported</td></tr><tr><td>H2</td><td>Levelling: on easy, checkable tasks logic adds less than +5.0 points per SD to the AI gain</td><td>-9.29</td><td>0.0015</td><td>0.0045</td><td>Supported</td></tr><tr><td>H4</td><td>Mechanism: the logic advantage runs through catching AI errors (d′)</td><td>17.81</td><td>0.0044</td><td>0.0088</td><td>Supported</td></tr></table></div>
+<p class="muted">Estimates for H1/H2 are percentage points of AI gain (score with the AI minus score alone,
+same items) per 1 SD of logic score, adjusting for knowledge (MMLU) and model size. H4 is the indirect effect through error-detection d′. p-values: wild cluster
+bootstrap (H1, H2) and cluster bootstrap (H4), clustered by model.</p>
+<h2>Replication with the second assistant</h2>
+<pre>{
+  &quot;assistant&quot;: &quot;mock-assistant-b&quot;,
+  &quot;H1_p&quot;: 0.0608,
+  &quot;H2_p&quot;: 0.0015,
+  &quot;H4_p&quot;: 0.0016,
+  &quot;H1_estimate&quot;: 4.694531763161248,
+  &quot;H2_estimate&quot;: -9.587395755950944
+}</pre>
+<h2>Figures</h2><figure><img src="../analysis/fig1_gain_vs_logic.png" alt="fig1_gain_vs_logic"></figure><figure><img src="../analysis/fig2_detection_vs_logic.png" alt="fig2_detection_vs_logic"></figure><figure><img src="../analysis/fig4_multiverse.png" alt="fig4_multiverse"></figure>
+<h2>Gates (G1 to G7) and self-checks (C1 to C12)</h2>
+<pre>{
+  &quot;gates_run&quot;: {
+    &quot;G1&quot;: {
+      &quot;gate&quot;: &quot;G1&quot;,
+      &quot;n_cases&quot;: 29,
+      &quot;n_correct&quot;: 29,
+      &quot;pass&quot;: true,
+      &quot;failures&quot;: []
+    },
+    &quot;G4_G5&quot;: {
+      &quot;mock-assistant-a&quot;: {
+        &quot;G4_manipulation_pass&quot;: true,
+        &quot;n_planted&quot;: 150,
+        &quot;n_clean&quot;: 150,
+        &quot;leaks&quot;: 0,
+        &quot;failed_after_retries&quot;: 0,
+        &quot;G5_feature_auc&quot;: {
+          &quot;chars&quot;: 0.5313555555555556,
+          &quot;lines&quot;: 0.5309555555555555,
+          &quot;steps&quot;: 0.5309555555555555,
+          &quot;hedges&quot;: 0.5,
+          &quot;negations&quot;: 0.5
+        },
+        &quot;G5_worst_auc&quot;: 0.5313555555555556,
+        &quot;G5_pass&quot;: true
+      },
+      &quot;mock-assistant-b&quot;: {
+        &quot;G4_manipulation_pass&quot;: true,
+        &quot;n_planted&quot;: 150,
+        &quot;n_clean&quot;: 150,
+        &quot;leaks&quot;: 0,
+        &quot;failed_after_retries&quot;: 0,
+        &quot;G5_feature_auc&quot;: {
+          &quot;chars&quot;: 0.5078,
+          &quot;lines&quot;: 0.5086222222222222,
+          &quot;steps&quot;: 0.5086222222222222,
+          &quot;hedges&quot;: 0.5,
+          &quot;negations&quot;: 0.5
+        },
+        &quot;G5_worst_auc&quot;: 0.5086222222222222,
+        &quot;G5_pass&quot;: true
+      }
+    },
+    &quot;G2_G3&quot;: {
+      &quot;n_units&quot;: 84,
+      &quot;n_excluded&quot;: 3,
+      &quot;excluded&quot;: [
+        {
+          &quot;solver_unit&quot;: &quot;mock-solver-27|brief&quot;,
+          &quot;reason&quot;: &quot;G2 collapsed: 100% same answer in conditional&quot;
+        },
+        {
+          &quot;solver_unit&quot;: &quot;mock-solver-27|careful&quot;,
+          &quot;reason&quot;: &quot;G2 collapsed: 100% same answer in conditional&quot;
+        },
+        {
+          &quot;solver_unit&quot;: &quot;mock-solver-27|direct&quot;,
+          &quot;reason&quot;: &quot;G2 collapsed: 100% same answer in conditional&quot;
+        }
+      ]
+    }
+  },
+  &quot;gates_analysis&quot;: {
+    &quot;G6&quot;: {
+      &quot;mock-assistant-a&quot;: {
+        &quot;gate&quot;: &quot;G6&quot;,
+        &quot;assistant&quot;: &quot;mock-assistant-a&quot;,
+        &quot;n_solvers&quot;: 84,
+        &quot;flag_rate_catch_mean&quot;: 0.8462301587301587,
+        &quot;false_alarm_clean_mean&quot;: 0.11119047619047619,
+        &quot;median_difference&quot;: 0.8183333333333334,
+        &quot;p_one_sided&quot;: 4.17012641832074e-15,
+        &quot;pass&quot;: true
+      },
+      &quot;mock-assistant-b&quot;: {
+        &quot;gate&quot;: &quot;G6&quot;,
+        &quot;assistant&quot;: &quot;mock-assistant-b&quot;,
+        &quot;n_solvers&quot;: 84,
+        &quot;flag_rate_catch_mean&quot;: 0.8492063492063493,
+        &quot;false_alarm_clean_mean&quot;: 0.10785714285714286,
+        &quot;median_difference&quot;: 0.8266666666666667,
+        &quot;p_one_sided&quot;: 5.2129270127973424e-15,
+        &quot;pass&quot;: true
+      }
+    },
+    &quot;G7&quot;: {
+      &quot;gate&quot;: &quot;G7&quot;,
+      &quot;benchmarks&quot;: [
+        &quot;acc_folio&quot;,
+        &quot;acc_logiqa&quot;
+      ],
+      &quot;spearman_rho&quot;: 0.9691304370073401,
+      &quot;p_one_sided&quot;: 4.2100748314484747e-50,
+      &quot;n&quot;: 81,
+      &quot;pass&quot;: true
+    },
+    &quot;G5&quot;: {
+      &quot;mock-assistant-a&quot;: {
+        &quot;pass&quot;: true,
+        &quot;worst_auc&quot;: 0.5313555555555556
+      },
+      &quot;mock-assistant-b&quot;: {
+        &quot;pass&quot;: true,
+        &quot;worst_auc&quot;: 0.5086222222222222
+      }
+    }
+  },
+  &quot;self_checks&quot;: [
+    {
+      &quot;id&quot;: &quot;C1&quot;,
+      &quot;check&quot;: &quot;Every AI reply matches its stored SHA-256&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;238960 replies, 0 mismatches&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C2&quot;,
+      &quot;check&quot;: &quot;Deduction answer keys recomputed by an independent SAT solver&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;324 items, 0 disagreements&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C3&quot;,
+      &quot;check&quot;: &quot;Syllogism answer keys recomputed by the rules of the syllogism&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;120 items, 0 disagreements&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C4&quot;,
+      &quot;check&quot;: &quot;Planted-error assignment re-derived from item ids and seed (exact half per answer type)&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;150 of 300 items planted&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C5&quot;,
+      &quot;check&quot;: &quot;Logic scores recomputed from the raw replies&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;84 solvers, max difference 5.6e-17&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C6&quot;,
+      &quot;check&quot;: &quot;Main regression recomputed with statsmodels (coefficient and cluster SE)&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;max difference 2.2e-15&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C7&quot;,
+      &quot;check&quot;: &quot;Holm correction recomputed with statsmodels&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;max difference 0.0e+00&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C8&quot;,
+      &quot;check&quot;: &quot;Lock held: registered and development items do not overlap&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;profile uses dev; overlap 0&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C9&quot;,
+      &quot;check&quot;: &quot;No solver prompt contains a clue about the answer or the planted error&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;237832 prompts scanned, 0 leaks&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C10&quot;,
+      &quot;check&quot;: &quot;Config and prompts in the run folder match the manifest&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;SHA-256 compared&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C11&quot;,
+      &quot;check&quot;: &quot;Preregistration freeze status&quot;,
+      &quot;result&quot;: &quot;n/a&quot;,
+      &quot;detail&quot;: &quot;NOT_FROZEN (not required for this profile)&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C12&quot;,
+      &quot;check&quot;: &quot;Answer parser passed its known-answer test&quot;,
+      &quot;result&quot;: &quot;pass&quot;,
+      &quot;detail&quot;: &quot;29 of 29 known replies read correctly&quot;
+    }
+  ]
+}</pre>
+<h2>Measurement checks</h2>
+<pre>{
+  &quot;validity&quot;: {
+    &quot;logic_score~acc_folio&quot;: {
+      &quot;pearson&quot;: 0.951370705739837,
+      &quot;spearman&quot;: 0.9584149809278867
+    },
+    &quot;logic_score~acc_logiqa&quot;: {
+      &quot;pearson&quot;: 0.9660950102835835,
+      &quot;spearman&quot;: 0.9664411720668256
+    },
+    &quot;logic_score~acc_mmlu&quot;: {
+      &quot;pearson&quot;: 0.5818175502578307,
+      &quot;spearman&quot;: 0.5263886302745587
+    },
+    &quot;logic_score~belief_bias_index&quot;: {
+      &quot;pearson&quot;: 0.05251780252943664,
+      &quot;spearman&quot;: 0.03694050358971744
+    },
+    &quot;logic_score~log_params&quot;: {
+      &quot;pearson&quot;: 0.3657846887031867,
+      &quot;spearman&quot;: 0.31112235729395954
+    },
+    &quot;alone_easy_math~acc_gsm8k&quot;: {
+      &quot;pearson&quot;: null
+    },
+    &quot;logic_battery_standardized_alpha&quot;: 0.9264879336844419
+  },
+  &quot;manipulation_check&quot;: {
+    &quot;assistant_wrong_when_planted&quot;: 1.0,
+    &quot;assistant_wrong_when_clean&quot;: 0.0
+  },
+  &quot;quality&quot;: {
+    &quot;api_error_rate&quot;: 0.0,
+    &quot;unparsed_rate&quot;: 0.00223687308688486,
+    &quot;ceiling_easy_alone_share_over_95&quot;: 0.037037037037037035,
+    &quot;floor_hard_alone_share_under_40&quot;: 0.14814814814814814
+  }
+}</pre>
+<h2>Descriptives</h2><pre>{
+  &quot;logic_score&quot;: {
+    &quot;mean&quot;: 0.5447702331961591,
+    &quot;sd&quot;: 0.12240896237798198,
+    &quot;min&quot;: 0.3069444444444444,
+    &quot;max&quot;: 0.7722222222222223
+  },
+  &quot;acc_mmlu&quot;: {
+    &quot;mean&quot;: 0.48203703703703704,
+    &quot;sd&quot;: 0.12337640013840212,
+    &quot;min&quot;: 0.2125,
+    &quot;max&quot;: 0.7125
+  },
+  &quot;alone_easy_math&quot;: {
+    &quot;mean&quot;: 0.6234567901234568,
+    &quot;sd&quot;: 0.2686036135917905,
+    &quot;min&quot;: 0.0,
+    &quot;max&quot;: 0.985
+  },
+  &quot;alone_hard_deduction&quot;: {
+    &quot;mean&quot;: 0.6081481481481482,
+    &quot;sd&quot;: 0.18671576735181683,
+    &quot;min&quot;: 0.2966666666666667,
+    &quot;max&quot;: 0.98
+  },
+  &quot;gain_easy_math__mock-assistant-a&quot;: {
+    &quot;mean&quot;: 24.246913580246915,
+    &quot;sd&quot;: 17.924864618873368,
+    &quot;min&quot;: -0.5,
+    &quot;max&quot;: 67.5
+  },
+  &quot;gain_easy_math__mock-assistant-b&quot;: {
+    &quot;mean&quot;: 24.358024691358025,
+    &quot;sd&quot;: 18.15010925722991,
+    &quot;min&quot;: -0.5,
+    &quot;max&quot;: 67.5
+  },
+  &quot;gain_hard_error__mock-assistant-a&quot;: {
+    &quot;mean&quot;: -31.127572016460906,
+    &quot;sd&quot;: 14.630501614894456,
+    &quot;min&quot;: -54.66666666666666,
+    &quot;max&quot;: 4.666666666666669
+  },
+  &quot;gain_hard_error__mock-assistant-b&quot;: {
+    &quot;mean&quot;: -31.366255144032927,
+    &quot;sd&quot;: 14.254005766242967,
+    &quot;min&quot;: -54.66666666666666,
+    &quot;max&quot;: 3.3333333333333326
+  },
+  &quot;gain_hard_clean__mock-assistant-a&quot;: {
+    &quot;mean&quot;: 31.30041152263374,
+    &quot;sd&quot;: 17.105197791759057,
+    &quot;min&quot;: -1.3333333333333308,
+    &quot;max&quot;: 63.33333333333333
+  },
+  &quot;gain_hard_clean__mock-assistant-b&quot;: {
+    &quot;mean&quot;: 31.77777777777778,
+    &quot;sd&quot;: 17.2156259769367,
+    &quot;min&quot;: -0.6666666666666654,
+    &quot;max&quot;: 64.66666666666667
+  },
+  &quot;dprime__mock-assistant-a&quot;: {
+    &quot;mean&quot;: 0.8928517222364755,
+    &quot;sd&quot;: 1.1585221134579677,
+    &quot;min&quot;: -1.5847827482457704,
+    &quot;max&quot;: 3.8080923649822855
+  },
+  &quot;dprime__mock-assistant-b&quot;: {
+    &quot;mean&quot;: 0.915605492704193,
+    &quot;sd&quot;: 1.149977060820513,
+    &quot;min&quot;: -1.062238935006044,
+    &quot;max&quot;: 3.9769126090014257
+  }
+}</pre>
+<h2>Run provenance</h2>
+<pre>{
+  &quot;run_id&quot;: &quot;20261105T193029Z-201ab2e1-mock&quot;,
+  &quot;package_version&quot;: &quot;0.2.0&quot;,
+  &quot;config_sha256&quot;: &quot;73f83c55e6b0b89cc3d1f6276f25ce57cb16016379b8bab9b20db4f447c6a652&quot;,
+  &quot;prompts_sha256&quot;: &quot;e6bc6f069bcfccd6ae50959548b245b4a6999ffd41049273845416ae9525f4ec&quot;,
+  &quot;seed&quot;: 7110526,
+  &quot;started_utc&quot;: &quot;2026-11-05T19:30:29+00:00&quot;,
+  &quot;finished_utc&quot;: &quot;2026-11-05T19:32:36+00:00&quot;,
+  &quot;duration_s&quot;: 127.3
+}
+Stage hashes:
+{
+  &quot;items&quot;: {
+    &quot;counts&quot;: {
+      &quot;syllogism&quot;: 120,
+      &quot;conditional&quot;: 80,
+      &quot;crt&quot;: 30,
+      &quot;easy_math&quot;: 200,
+      &quot;hard_deduction&quot;: 300,
+      &quot;logic_creative&quot;: 40,
+      &quot;catch&quot;: 24,
+      &quot;folio&quot;: 200,
+      &quot;logiqa&quot;: 300,
+      &quot;gsm8k&quot;: 300,
+      &quot;mmlu&quot;: 400
+    },
+    &quot;sha256&quot;: {
+      &quot;syllogism&quot;: &quot;bd8aeb8ac57b0919673de2bcfa4c4fa03d2ffc33f33cfdc7f119ac5b2612fe97&quot;,
+      &quot;conditional&quot;: &quot;2e138d8157cda3b563f5fbc506d3fb00769821e97de95efdca21fd076db68720&quot;,
+      &quot;crt&quot;: &quot;301344a2261d8c4453964d1f8e130023cd147a10b0a46fb4cc48f69028ba9680&quot;,
+      &quot;easy_math&quot;: &quot;6331139cad9845e424f68df25eae582edfdb2c0d521b28737d4d710c67d2d6b0&quot;,
+      &quot;hard_deduction&quot;: &quot;945e396537521f4b6febe4e263810dcecb9be49c31c3aba000d0e2a18c994fa9&quot;,
+      &quot;logic_creative&quot;: &quot;32995178f86f9232e1bda0f526fe0caa7a040fc6dbe335ceab95aea928624a48&quot;,
+      &quot;catch&quot;: &quot;3cd95960357722630373bfc49ca9aab776eb026a20d1b2f79893f8804dad7bb1&quot;,
+      &quot;folio&quot;: &quot;7ef996eed89788dbdaec8cbbbb3b9fb5cb9f271483c6711f8e2e13e65dabc40f&quot;,
+      &quot;logiqa&quot;: &quot;6c5ea51028738225fea1f3a352e8bfa92f937a96062b56459a1e4b0107194fcd&quot;,
+      &quot;gsm8k&quot;: &quot;e917a7bdc1a4d9e5eb510a2ddb566de59a2d816d57f7eea04d4c724743112500&quot;,
+      &quot;mmlu&quot;: &quot;8a0eb433a0444879b576934fefc6c81452c82987eca59865726307741d39d763&quot;
+    },
+    &quot;benchmarks&quot;: {
+      &quot;folio&quot;: {
+        &quot;repo&quot;: &quot;SYNTHETIC stand-in (offline run)&quot;,
+        &quot;n&quot;: 200,
+        &quot;status&quot;: &quot;synthetic&quot;
+      },
+      &quot;logiqa&quot;: {
+        &quot;repo&quot;: &quot;SYNTHETIC stand-in (offline run)&quot;,
+        &quot;n&quot;: 300,
+        &quot;status&quot;: &quot;synthetic&quot;
+      },
+      &quot;gsm8k&quot;: {
+        &quot;repo&quot;: &quot;SYNTHETIC stand-in (offline run)&quot;,
+        &quot;n&quot;: 300,
+        &quot;status&quot;: &quot;synthetic&quot;
+      },
+      &quot;mmlu&quot;: {
+        &quot;repo&quot;: &quot;SYNTHETIC stand-in (offline run)&quot;,
+        &quot;n&quot;: 400,
+        &quot;status&quot;: &quot;synthetic&quot;
+      }
+    }
+  },
+  &quot;assistants&quot;: {
+    &quot;mock-assistant-a&quot;: {
+      &quot;n&quot;: 564,
+      &quot;failed&quot;: 0,
+      &quot;hard_planted&quot;: 150,
+      &quot;hard_clean&quot;: 150,
+      &quot;models_reported&quot;: [
+        &quot;mock-a&quot;
+      ],
+      &quot;sha256&quot;: &quot;741cfffb3e910765c6de83d147410d921f3a5f57ad60b4e4ab167b769731e571&quot;
+    },
+    &quot;mock-assistant-b&quot;: {
+      &quot;n&quot;: 564,
+      &quot;failed&quot;: 0,
+      &quot;hard_planted&quot;: 150,
+      &quot;hard_clean&quot;: 150,
+      &quot;models_reported&quot;: [
+        &quot;mock-b&quot;
+      ],
+      &quot;sha256&quot;: &quot;c9e0c90617191724b8da2a1308ace639a6f964e651c40c9b9b36894bc18ccf62&quot;
+    }
+  },
+  &quot;trials&quot;: {
+    &quot;n&quot;: 237832,
+    &quot;api_errors&quot;: 0,
+    &quot;unparsed&quot;: 532,
+    &quot;llm_calls_new&quot;: 238960,
+    &quot;llm_cache_hits&quot;: 0,
+    &quot;models_reported&quot;: [
+      &quot;mock-solver-00=mock-00&quot;,
+      &quot;mock-solver-01=mock-01&quot;,
+      &quot;mock-solver-02=mock-02&quot;,
+      &quot;mock-solver-03=mock-03&quot;,
+      &quot;mock-solver-04=mock-04&quot;,
+      &quot;mock-solver-05=mock-05&quot;,
+      &quot;mock-solver-06=mock-06&quot;,
+      &quot;mock-solver-07=mock-07&quot;,
+      &quot;mock-solver-08=mock-08&quot;,
+      &quot;mock-solver-09=mock-09&quot;,
+      &quot;mock-solver-10=mock-10&quot;,
+      &quot;mock-solver-11=mock-11&quot;,
+      &quot;mock-solver-12=mock-12&quot;,
+      &quot;mock-solver-13=mock-13&quot;,
+      &quot;mock-solver-14=mock-14&quot;,
+      &quot;mock-solver-15=mock-15&quot;,
+      &quot;mock-solver-16=mock-16&quot;,
+      &quot;mock-solver-17=mock-17&quot;,
+      &quot;mock-solver-18=mock-18&quot;,
+      &quot;mock-solver-19=mock-19&quot;,
+      &quot;mock-solver-20=mock-20&quot;,
+      &quot;mock-solver-21=mock-21&quot;,
+      &quot;mock-solver-22=mock-22&quot;,
+      &quot;mock-solver-23=mock-23&quot;,
+      &quot;mock-solver-24=mock-24&quot;,
+      &quot;mock-solver-25=mock-25&quot;,
+      &quot;mock-solver-26=mock-26&quot;,
+      &quot;mock-solver-27=mock-27&quot;
+    ],
+    &quot;sha256&quot;: &quot;70dca4a82da37d592829738401b115a6f379799e3af703c6a919a1c31cb75d1a&quot;
+  },
+  &quot;scored&quot;: {
+    &quot;trials&quot;: &quot;3fb2493e7d8ad5f815f458d8cb496080b9c9806d62ddedc383a2f189703fe60a&quot;,
+    &quot;solver_level&quot;: &quot;3df47b830171c348b04ee9267b48b425ef343348b4a72e54cd9a6d8dde9513a4&quot;
+  },
+  &quot;analysis&quot;: {
+    &quot;results_sha256&quot;: &quot;ade1d0f18383a6dfd6238f500a1088caf47fe69258383c277dc550a776c6b6a9&quot;
+  }
+}</pre>
+<p class="muted">Every file in this run folder is listed with its SHA-256 in SHA256SUMS.txt.
+Check it with: <code>python -m logicxai verify /tmp/claude-0/runs2/20261105T193029Z-201ab2e1-mock</code></p>
+</body></html>

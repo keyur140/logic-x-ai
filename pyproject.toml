@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logicxai"
+version = "0.2.0"
+description = "Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance (computational study)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "KEYUR SHAILESHKUMAR PATEL"}]
+dependencies = ["numpy", "pandas", "scipy", "requests", "PyYAML", "matplotlib", "reportlab", "datasets", "huggingface_hub"]
+
+[project.scripts]
+logicxai = "logicxai.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

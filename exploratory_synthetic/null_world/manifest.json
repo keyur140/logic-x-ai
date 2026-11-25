@@ -1,0 +1,808 @@
+{
+  "run_id": "20261105T193237Z-0da35171-mock_null",
+  "profile": "mock_null",
+  "synthetic": true,
+  "world": "null",
+  "package_version": "0.2.0",
+  "author": {
+    "name": "KEYUR SHAILESHKUMAR PATEL",
+    "orcid": "https://orcid.org/0009-0008-5261-043X",
+    "affiliations": [
+      "MSc Artificial Intelligence student, Department of Computer Science, Brunel University London, UK",
+      "Independent researcher"
+    ],
+    "note": "Conducted independently; not an official Brunel University London project."
+  },
+  "started_utc": "2026-11-05T19:32:37+00:00",
+  "route": "mock",
+  "config_sha256": "73f83c55e6b0b89cc3d1f6276f25ce57cb16016379b8bab9b20db4f447c6a652",
+  "prompts_sha256": "e6bc6f069bcfccd6ae50959548b245b4a6999ffd41049273845416ae9525f4ec",
+  "seed": 7110526,
+  "item_set": "dev",
+  "freeze": {
+    "status": "NOT_FROZEN",
+    "code_sha256_now": "4959fb638cdf8341b99d1bf454486ea5d331894871d34c2c507284a5d16541a9",
+    "changed": []
+  },
+  "environment": {
+    "python": "3.13.17 (main, Oct 22 2026, 14:06:04) [GCC 13.3.0]",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "packages": [
+      "Jinja2==3.1.6",
+      "MarkupSafe==3.0.3",
+      "PyGObject==3.48.2",
+      "PyJWT==2.15.0",
+      "PyYAML==6.0.3",
+      "Pygments==2.21.0",
+      "aiohappyeyeballs==2.7.1",
+      "aiohttp==3.14.5",
+      "aiosignal==1.4.0",
+      "annotated-types==0.8.0",
+      "anyio==4.15.1",
+      "argcomplete==3.1.4",
+      "attrs==26.1.0",
+      "beautifulsoup4==4.15.0",
+      "blinker==1.7.0",
+      "certifi==2026.10.18",
+      "cffi==2.1.1",
+      "charset-normalizer==3.5.1",
+      "claude-agent-sdk==0.2.172",
+      "click==8.5.0",
+      "colorama==0.4.6",
+      "conan==2.32.0",
+      "contourpy==1.4.0",
+      "cryptography==50.0.1",
+      "cycler==0.12.1",
+      "datasets==5.1.0",
+      "dbus-python==1.3.2",
+      "defusedxml==0.7.1",
+      "dill==0.4.1",
+      "distro==1.9.0",
+      "et_xmlfile==2.0.0",
+      "fasteners==0.20",
+      "filelock==4.2.4",
+      "flatbuffers==25.12.19",
+      "fonttools==4.67.0",
+      "formulaic==1.2.2",
+      "frozenlist==1.8.0",
+      "fsspec==2026.7.0",
+      "h11==0.16.0",
+      "hf-xet==1.7.0",
+      "httpcore2==2.13.1",
+      "httplib2==0.20.4",
+      "httpx2==2.13.1",
+      "huggingface_hub==2.3.0",
+      "idna==3.20",
+      "iniconfig==2.3.1",
+      "interface_meta==2.0.1",
+      "jsonschema-specifications==2025.9.1",
+      "jsonschema==4.26.0",
+      "kiwisolver==1.5.1",
+      "launchpadlib==1.11.0",
+      "lazr.restfulclient==0.14.6",
+      "lazr.uri==1.0.6",
+      "lxml==6.1.3",
+      "magika==0.6.3",
+      "markdownify==1.2.3",
+      "markitdown==0.1.7",
+      "matplotlib==3.11.2",
+      "mcp-types==2.3.0",
+      "mcp==2.3.0",
+      "multidict==7.2.1",
+      "multiprocess==0.70.19",
+      "narwhals==2.27.1",
+      "numpy==2.5.3",
+      "oauthlib==3.2.2",
+      "onnxruntime==1.29.0",
+      "openpyxl==3.1.5",
+      "opentelemetry-api==1.45.0",
+      "packaging==26.3",
+      "pandas==3.0.5",
+      "patch-ng==1.19.1",
+      "patsy==1.0.3",
+      "pdfminer.six==20260107",
+      "pdfplumber==0.11.10",
+      "pillow==12.3.0",
+      "pluggy==1.7.0",
+      "propcache==0.5.4",
+      "protobuf==7.36.1",
+      "pyarrow==26.0.0",
+      "pycparser==3.0",
+      "pydantic==2.13.5",
+      "pydantic_core==2.46.5",
+      "pyparsing==3.1.1",
+      "pypdf==6.17.0",
+      "pypdfium2==5.13.0",
+      "pytest==9.1.1",
+      "python-apt==2.7.7+ubuntu5.3",
+      "python-dateutil==2.9.0.post0",
+      "python-docx==1.2.0",
+      "python-dotenv==1.2.3",
+      "python-multipart==0.0.32",
+      "python-pptx==1.0.2",
+      "referencing==0.37.0",
+      "reportlab==5.0.1",
+      "requests==2.34.2",
+      "rpds-py==2026.6.3",
+      "scipy==1.18.1",
+      "setuptools==68.1.2",
+      "six==1.17.0",
+      "sniffio==1.3.1",
+      "soupsieve==2.9.2",
+      "sse-starlette==3.4.11",
+      "starlette==1.7.0",
+      "statsmodels==0.15.0",
+      "toml==0.10.2",
+      "tqdm==4.70.1",
+      "truststore==0.10.4",
+      "typing-inspection==0.4.4",
+      "typing_extensions==4.16.0",
+      "urllib3==2.8.0",
+      "uvicorn==0.54.0",
+      "wadllib==1.3.6",
+      "wheel==0.42.0",
+      "wrapt==2.5.2rc1",
+      "xlsxwriter==3.2.9",
+      "xmltodict==0.13.0",
+      "xxhash==4.0.2",
+      "yarl==1.25.1",
+      "yq==3.1.0"
+    ],
+    "env_flags": {}
+  },
+  "library_deviations": [],
+  "stages": {
+    "items": {
+      "counts": {
+        "syllogism": 120,
+        "conditional": 80,
+        "crt": 30,
+        "easy_math": 200,
+        "hard_deduction": 300,
+        "logic_creative": 40,
+        "catch": 24,
+        "folio": 200,
+        "logiqa": 300,
+        "gsm8k": 300,
+        "mmlu": 400
+      },
+      "sha256": {
+        "syllogism": "bd8aeb8ac57b0919673de2bcfa4c4fa03d2ffc33f33cfdc7f119ac5b2612fe97",
+        "conditional": "2e138d8157cda3b563f5fbc506d3fb00769821e97de95efdca21fd076db68720",
+        "crt": "301344a2261d8c4453964d1f8e130023cd147a10b0a46fb4cc48f69028ba9680",
+        "easy_math": "6331139cad9845e424f68df25eae582edfdb2c0d521b28737d4d710c67d2d6b0",
+        "hard_deduction": "945e396537521f4b6febe4e263810dcecb9be49c31c3aba000d0e2a18c994fa9",
+        "logic_creative": "32995178f86f9232e1bda0f526fe0caa7a040fc6dbe335ceab95aea928624a48",
+        "catch": "3cd95960357722630373bfc49ca9aab776eb026a20d1b2f79893f8804dad7bb1",
+        "folio": "7ef996eed89788dbdaec8cbbbb3b9fb5cb9f271483c6711f8e2e13e65dabc40f",
+        "logiqa": "6c5ea51028738225fea1f3a352e8bfa92f937a96062b56459a1e4b0107194fcd",
+        "gsm8k": "e917a7bdc1a4d9e5eb510a2ddb566de59a2d816d57f7eea04d4c724743112500",
+        "mmlu": "8a0eb433a0444879b576934fefc6c81452c82987eca59865726307741d39d763"
+      },
+      "benchmarks": {
+        "folio": {
+          "repo": "SYNTHETIC stand-in (offline run)",
+          "n": 200,
+          "status": "synthetic"
+        },
+        "logiqa": {
+          "repo": "SYNTHETIC stand-in (offline run)",
+          "n": 300,
+          "status": "synthetic"
+        },
+        "gsm8k": {
+          "repo": "SYNTHETIC stand-in (offline run)",
+          "n": 300,
+          "status": "synthetic"
+        },
+        "mmlu": {
+          "repo": "SYNTHETIC stand-in (offline run)",
+          "n": 400,
+          "status": "synthetic"
+        }
+      }
+    },
+    "assistants": {
+      "mock-assistant-a": {
+        "n": 564,
+        "failed": 0,
+        "hard_planted": 150,
+        "hard_clean": 150,
+        "models_reported": [
+          "mock-a"
+        ],
+        "sha256": "741cfffb3e910765c6de83d147410d921f3a5f57ad60b4e4ab167b769731e571"
+      },
+      "mock-assistant-b": {
+        "n": 564,
+        "failed": 0,
+        "hard_planted": 150,
+        "hard_clean": 150,
+        "models_reported": [
+          "mock-b"
+        ],
+        "sha256": "c9e0c90617191724b8da2a1308ace639a6f964e651c40c9b9b36894bc18ccf62"
+      }
+    },
+    "trials": {
+      "n": 237832,
+      "api_errors": 0,
+      "unparsed": 532,
+      "llm_calls_new": 238960,
+      "llm_cache_hits": 0,
+      "models_reported": [
+        "mock-solver-00=mock-00",
+        "mock-solver-01=mock-01",
+        "mock-solver-02=mock-02",
+        "mock-solver-03=mock-03",
+        "mock-solver-04=mock-04",
+        "mock-solver-05=mock-05",
+        "mock-solver-06=mock-06",
+        "mock-solver-07=mock-07",
+        "mock-solver-08=mock-08",
+        "mock-solver-09=mock-09",
+        "mock-solver-10=mock-10",
+        "mock-solver-11=mock-11",
+        "mock-solver-12=mock-12",
+        "mock-solver-13=mock-13",
+        "mock-solver-14=mock-14",
+        "mock-solver-15=mock-15",
+        "mock-solver-16=mock-16",
+        "mock-solver-17=mock-17",
+        "mock-solver-18=mock-18",
+        "mock-solver-19=mock-19",
+        "mock-solver-20=mock-20",
+        "mock-solver-21=mock-21",
+        "mock-solver-22=mock-22",
+        "mock-solver-23=mock-23",
+        "mock-solver-24=mock-24",
+        "mock-solver-25=mock-25",
+        "mock-solver-26=mock-26",
+        "mock-solver-27=mock-27"
+      ],
+      "sha256": "d935e72a3d42353fb64be99fe01cf18a9c4d99112039cb37587cb9975d68609b"
+    },
+    "scored": {
+      "trials": "bf3aae650534c5c0ad15233547d693265fc943c6f7a0aa4b57c408ad4ee5d5ec",
+      "solver_level": "cb6723cbd23ae938a6f1051a9e1c9a686b8533469b5162908522a0fd93951282"
+    },
+    "analysis": {
+      "results_sha256": "b81ab59935595814c46da0d458cea1e678e224e171369db2019556933e23cfd9"
+    }
+  },
+  "gates": {
+    "G1": {
+      "gate": "G1",
+      "n_cases": 29,
+      "n_correct": 29,
+      "pass": true,
+      "failures": []
+    },
+    "G4_G5": {
+      "mock-assistant-a": {
+        "G4_manipulation_pass": true,
+        "n_planted": 150,
+        "n_clean": 150,
+        "leaks": 0,
+        "failed_after_retries": 0,
+        "G5_feature_auc": {
+          "chars": 0.5313555555555556,
+          "lines": 0.5309555555555555,
+          "steps": 0.5309555555555555,
+          "hedges": 0.5,
+          "negations": 0.5
+        },
+        "G5_worst_auc": 0.5313555555555556,
+        "G5_pass": true
+      },
+      "mock-assistant-b": {
+        "G4_manipulation_pass": true,
+        "n_planted": 150,
+        "n_clean": 150,
+        "leaks": 0,
+        "failed_after_retries": 0,
+        "G5_feature_auc": {
+          "chars": 0.5078,
+          "lines": 0.5086222222222222,
+          "steps": 0.5086222222222222,
+          "hedges": 0.5,
+          "negations": 0.5
+        },
+        "G5_worst_auc": 0.5086222222222222,
+        "G5_pass": true
+      }
+    },
+    "G2_G3": {
+      "n_units": 84,
+      "n_excluded": 3,
+      "excluded": [
+        {
+          "solver_unit": "mock-solver-27|brief",
+          "reason": "G2 collapsed: 100% same answer in conditional"
+        },
+        {
+          "solver_unit": "mock-solver-27|careful",
+          "reason": "G2 collapsed: 100% same answer in conditional"
+        },
+        {
+          "solver_unit": "mock-solver-27|direct",
+          "reason": "G2 collapsed: 100% same answer in conditional"
+        }
+      ]
+    }
+  },
+  "solvers": [
+    {
+      "alias": "mock-solver-00",
+      "provider": "mock",
+      "model_id": "mock-00",
+      "params_b": 4.38,
+      "family": "mockfam0",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-01",
+      "provider": "mock",
+      "model_id": "mock-01",
+      "params_b": 5.06,
+      "family": "mockfam1",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-02",
+      "provider": "mock",
+      "model_id": "mock-02",
+      "params_b": 7.79,
+      "family": "mockfam2",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-03",
+      "provider": "mock",
+      "model_id": "mock-03",
+      "params_b": 16.11,
+      "family": "mockfam3",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-04",
+      "provider": "mock",
+      "model_id": "mock-04",
+      "params_b": 3.07,
+      "family": "mockfam4",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-05",
+      "provider": "mock",
+      "model_id": "mock-05",
+      "params_b": 0.93,
+      "family": "mockfam5",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-06",
+      "provider": "mock",
+      "model_id": "mock-06",
+      "params_b": 1.86,
+      "family": "mockfam6",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-07",
+      "provider": "mock",
+      "model_id": "mock-07",
+      "params_b": 4.66,
+      "family": "mockfam0",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-08",
+      "provider": "mock",
+      "model_id": "mock-08",
+      "params_b": 6.61,
+      "family": "mockfam1",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-09",
+      "provider": "mock",
+      "model_id": "mock-09",
+      "params_b": 6.87,
+      "family": "mockfam2",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-10",
+      "provider": "mock",
+      "model_id": "mock-10",
+      "params_b": 28.81,
+      "family": "mockfam3",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-11",
+      "provider": "mock",
+      "model_id": "mock-11",
+      "params_b": 1.22,
+      "family": "mockfam4",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-12",
+      "provider": "mock",
+      "model_id": "mock-12",
+      "params_b": 28.31,
+      "family": "mockfam5",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-13",
+      "provider": "mock",
+      "model_id": "mock-13",
+      "params_b": 2.08,
+      "family": "mockfam6",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-14",
+      "provider": "mock",
+      "model_id": "mock-14",
+      "params_b": 7.68,
+      "family": "mockfam0",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-15",
+      "provider": "mock",
+      "model_id": "mock-15",
+      "params_b": 2.64,
+      "family": "mockfam1",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-16",
+      "provider": "mock",
+      "model_id": "mock-16",
+      "params_b": 20.37,
+      "family": "mockfam2",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-17",
+      "provider": "mock",
+      "model_id": "mock-17",
+      "params_b": 10.7,
+      "family": "mockfam3",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-18",
+      "provider": "mock",
+      "model_id": "mock-18",
+      "params_b": 1.19,
+      "family": "mockfam4",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-19",
+      "provider": "mock",
+      "model_id": "mock-19",
+      "params_b": 6.61,
+      "family": "mockfam5",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-20",
+      "provider": "mock",
+      "model_id": "mock-20",
+      "params_b": 13.13,
+      "family": "mockfam6",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-21",
+      "provider": "mock",
+      "model_id": "mock-21",
+      "params_b": 17.87,
+      "family": "mockfam0",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-22",
+      "provider": "mock",
+      "model_id": "mock-22",
+      "params_b": 0.74,
+      "family": "mockfam1",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-23",
+      "provider": "mock",
+      "model_id": "mock-23",
+      "params_b": 3.78,
+      "family": "mockfam2",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-24",
+      "provider": "mock",
+      "model_id": "mock-24",
+      "params_b": 14.89,
+      "family": "mockfam3",
+      "synthetic_kind": "regular"
+    },
+    {
+      "alias": "mock-solver-25",
+      "provider": "mock",
+      "model_id": "mock-25",
+      "params_b": 0.16,
+      "family": "mockfam4",
+      "synthetic_kind": "random"
+    },
+    {
+      "alias": "mock-solver-26",
+      "provider": "mock",
+      "model_id": "mock-26",
+      "params_b": 10.1,
+      "family": "mockfam5",
+      "synthetic_kind": "random"
+    },
+    {
+      "alias": "mock-solver-27",
+      "provider": "mock",
+      "model_id": "mock-27",
+      "params_b": 7.34,
+      "family": "mockfam6",
+      "synthetic_kind": "collapsed"
+    }
+  ],
+  "assistants": [
+    {
+      "alias": "mock-assistant-a",
+      "provider": "mock",
+      "model_id": "mock-a",
+      "params_b": 70
+    },
+    {
+      "alias": "mock-assistant-b",
+      "provider": "mock",
+      "model_id": "mock-b",
+      "params_b": 72
+    }
+  ],
+  "lock": {
+    "item_set": "dev",
+    "overlap": 0,
+    "ok": true
+  },
+  "planted_items": [
+    "hard_deduction-7110526-00002",
+    "hard_deduction-7110526-00004",
+    "hard_deduction-7110526-00005",
+    "hard_deduction-7110526-00008",
+    "hard_deduction-7110526-00009",
+    "hard_deduction-7110526-00010",
+    "hard_deduction-7110526-00011",
+    "hard_deduction-7110526-00013",
+    "hard_deduction-7110526-00017",
+    "hard_deduction-7110526-00021",
+    "hard_deduction-7110526-00022",
+    "hard_deduction-7110526-00023",
+    "hard_deduction-7110526-00024",
+    "hard_deduction-7110526-00026",
+    "hard_deduction-7110526-00028",
+    "hard_deduction-7110526-00029",
+    "hard_deduction-7110526-00033",
+    "hard_deduction-7110526-00034",
+    "hard_deduction-7110526-00039",
+    "hard_deduction-7110526-00040",
+    "hard_deduction-7110526-00042",
+    "hard_deduction-7110526-00043",
+    "hard_deduction-7110526-00044",
+    "hard_deduction-7110526-00045",
+    "hard_deduction-7110526-00047",
+    "hard_deduction-7110526-00048",
+    "hard_deduction-7110526-00053",
+    "hard_deduction-7110526-00055",
+    "hard_deduction-7110526-00056",
+    "hard_deduction-7110526-00059",
+    "hard_deduction-7110526-00060",
+    "hard_deduction-7110526-00064",
+    "hard_deduction-7110526-00065",
+    "hard_deduction-7110526-00068",
+    "hard_deduction-7110526-00069",
+    "hard_deduction-7110526-00073",
+    "hard_deduction-7110526-00074",
+    "hard_deduction-7110526-00079",
+    "hard_deduction-7110526-00080",
+    "hard_deduction-7110526-00082",
+    "hard_deduction-7110526-00083",
+    "hard_deduction-7110526-00085",
+    "hard_deduction-7110526-00088",
+    "hard_deduction-7110526-00089",
+    "hard_deduction-7110526-00090",
+    "hard_deduction-7110526-00092",
+    "hard_deduction-7110526-00094",
+    "hard_deduction-7110526-00098",
+    "hard_deduction-7110526-00099",
+    "hard_deduction-7110526-00100",
+    "hard_deduction-7110526-00102",
+    "hard_deduction-7110526-00104",
+    "hard_deduction-7110526-00105",
+    "hard_deduction-7110526-00107",
+    "hard_deduction-7110526-00108",
+    "hard_deduction-7110526-00109",
+    "hard_deduction-7110526-00110",
+    "hard_deduction-7110526-00111",
+    "hard_deduction-7110526-00115",
+    "hard_deduction-7110526-00116",
+    "hard_deduction-7110526-00117",
+    "hard_deduction-7110526-00119",
+    "hard_deduction-7110526-00123",
+    "hard_deduction-7110526-00127",
+    "hard_deduction-7110526-00129",
+    "hard_deduction-7110526-00130",
+    "hard_deduction-7110526-00131",
+    "hard_deduction-7110526-00133",
+    "hard_deduction-7110526-00135",
+    "hard_deduction-7110526-00136",
+    "hard_deduction-7110526-00138",
+    "hard_deduction-7110526-00141",
+    "hard_deduction-7110526-00144",
+    "hard_deduction-7110526-00145",
+    "hard_deduction-7110526-00146",
+    "hard_deduction-7110526-00149",
+    "hard_deduction-7110526-00151",
+    "hard_deduction-7110526-00154",
+    "hard_deduction-7110526-00156",
+    "hard_deduction-7110526-00157",
+    "hard_deduction-7110526-00159",
+    "hard_deduction-7110526-00163",
+    "hard_deduction-7110526-00164",
+    "hard_deduction-7110526-00165",
+    "hard_deduction-7110526-00166",
+    "hard_deduction-7110526-00169",
+    "hard_deduction-7110526-00170",
+    "hard_deduction-7110526-00173",
+    "hard_deduction-7110526-00177",
+    "hard_deduction-7110526-00178",
+    "hard_deduction-7110526-00179",
+    "hard_deduction-7110526-00180",
+    "hard_deduction-7110526-00182",
+    "hard_deduction-7110526-00184",
+    "hard_deduction-7110526-00189",
+    "hard_deduction-7110526-00192",
+    "hard_deduction-7110526-00193",
+    "hard_deduction-7110526-00198",
+    "hard_deduction-7110526-00200",
+    "hard_deduction-7110526-00201",
+    "hard_deduction-7110526-00202",
+    "hard_deduction-7110526-00203",
+    "hard_deduction-7110526-00205",
+    "hard_deduction-7110526-00209",
+    "hard_deduction-7110526-00213",
+    "hard_deduction-7110526-00214",
+    "hard_deduction-7110526-00215",
+    "hard_deduction-7110526-00216",
+    "hard_deduction-7110526-00218",
+    "hard_deduction-7110526-00219",
+    "hard_deduction-7110526-00221",
+    "hard_deduction-7110526-00222",
+    "hard_deduction-7110526-00224",
+    "hard_deduction-7110526-00226",
+    "hard_deduction-7110526-00230",
+    "hard_deduction-7110526-00231",
+    "hard_deduction-7110526-00232",
+    "hard_deduction-7110526-00233",
+    "hard_deduction-7110526-00234",
+    "hard_deduction-7110526-00235",
+    "hard_deduction-7110526-00237",
+    "hard_deduction-7110526-00241",
+    "hard_deduction-7110526-00243",
+    "hard_deduction-7110526-00244",
+    "hard_deduction-7110526-00246",
+    "hard_deduction-7110526-00248",
+    "hard_deduction-7110526-00249",
+    "hard_deduction-7110526-00250",
+    "hard_deduction-7110526-00252",
+    "hard_deduction-7110526-00256",
+    "hard_deduction-7110526-00259",
+    "hard_deduction-7110526-00260",
+    "hard_deduction-7110526-00261",
+    "hard_deduction-7110526-00263",
+    "hard_deduction-7110526-00264",
+    "hard_deduction-7110526-00265",
+    "hard_deduction-7110526-00268",
+    "hard_deduction-7110526-00269",
+    "hard_deduction-7110526-00270",
+    "hard_deduction-7110526-00271",
+    "hard_deduction-7110526-00272",
+    "hard_deduction-7110526-00273",
+    "hard_deduction-7110526-00277",
+    "hard_deduction-7110526-00279",
+    "hard_deduction-7110526-00283",
+    "hard_deduction-7110526-00285",
+    "hard_deduction-7110526-00288",
+    "hard_deduction-7110526-00290",
+    "hard_deduction-7110526-00296",
+    "hard_deduction-7110526-00298"
+  ],
+  "self_checks": [
+    {
+      "id": "C1",
+      "check": "Every AI reply matches its stored SHA-256",
+      "result": "pass",
+      "detail": "238960 replies, 0 mismatches"
+    },
+    {
+      "id": "C2",
+      "check": "Deduction answer keys recomputed by an independent SAT solver",
+      "result": "pass",
+      "detail": "324 items, 0 disagreements"
+    },
+    {
+      "id": "C3",
+      "check": "Syllogism answer keys recomputed by the rules of the syllogism",
+      "result": "pass",
+      "detail": "120 items, 0 disagreements"
+    },
+    {
+      "id": "C4",
+      "check": "Planted-error assignment re-derived from item ids and seed (exact half per answer type)",
+      "result": "pass",
+      "detail": "150 of 300 items planted"
+    },
+    {
+      "id": "C5",
+      "check": "Logic scores recomputed from the raw replies",
+      "result": "pass",
+      "detail": "84 solvers, max difference 5.6e-17"
+    },
+    {
+      "id": "C6",
+      "check": "Main regression recomputed with statsmodels (coefficient and cluster SE)",
+      "result": "pass",
+      "detail": "max difference 7.1e-15"
+    },
+    {
+      "id": "C7",
+      "check": "Holm correction recomputed with statsmodels",
+      "result": "pass",
+      "detail": "max difference 0.0e+00"
+    },
+    {
+      "id": "C8",
+      "check": "Lock held: registered and development items do not overlap",
+      "result": "pass",
+      "detail": "profile uses dev; overlap 0"
+    },
+    {
+      "id": "C9",
+      "check": "No solver prompt contains a clue about the answer or the planted error",
+      "result": "pass",
+      "detail": "237832 prompts scanned, 0 leaks"
+    },
+    {
+      "id": "C10",
+      "check": "Config and prompts in the run folder match the manifest",
+      "result": "pass",
+      "detail": "SHA-256 compared"
+    },
+    {
+      "id": "C11",
+      "check": "Preregistration freeze status",
+      "result": "n/a",
+      "detail": "NOT_FROZEN (not required for this profile)"
+    },
+    {
+      "id": "C12",
+      "check": "Answer parser passed its known-answer test",
+      "result": "pass",
+      "detail": "29 of 29 known replies read correctly"
+    }
+  ],
+  "finished_utc": "2026-11-05T19:34:44+00:00",
+  "duration_s": 126.3
+}

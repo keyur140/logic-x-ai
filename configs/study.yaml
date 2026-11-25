@@ -1,0 +1,121 @@
+# Logic x AI study (logicxai)
+# Author: KEYUR SHAILESHKUMAR PATEL
+# ORCID: https://orcid.org/0009-0008-5261-043X
+# Affiliations: 1) MSc Artificial Intelligence student, Department of Computer Science, Brunel University London, UK;
+#               2) Independent researcher
+# Note: Conducted independently; not an official Brunel University London project.
+# License: MIT (see LICENSE)
+
+# Study configuration. Frozen at preregistration: its SHA-256 goes into the
+# OSF registration, and every run copies it into the run folder.
+
+study:
+  title: "Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance"
+  seed: 20261026            # REGISTERED seed: the confirmatory items. Locked until the freeze.
+  dev_seed: 7110526         # development seed: pilot and exploratory items only (never registered)
+  error_rate: 0.5           # share of hard_deduction items with a planted assistant error
+  modes: [direct, brief, careful]   # 28 models x 3 modes = 84 solvers
+  equivalence_bound_pp: 5.0 # H2: |slope| < 5 percentage points of AI gain per 1 SD logic
+  primary_outcome: gain     # decision 14: gain score (with AI minus alone) for H1, H2, H4; ANCOVA = sensitivity
+  alpha: 0.05
+  bootstrap_reps: 9999
+  collapse_share: 0.90      # G2: exclude a solver giving one answer on >90% of a choice family
+  max_unparsed: 0.20        # G3: exclude a solver with >20% unreadable answers in a family
+  max_api_fail: 0.10        # G3: exclude a solver with >10% API failures after retries
+  surface_auc_max: 0.65     # G5: planted vs clean assistant replies must not be separable by surface features
+
+  max_tokens: {direct: 64, brief: 384, careful: 1536, assistant: 1024}
+
+# Where models run. "api": free APIs first, Ollama as backup (USD 0, slower, versions not pinned).
+# "local": every model through Ollama (own PC or one rented GPU); each model pinned by its digest.
+route: api
+
+# Item counts per profile. "pilot" = small first run to check timing and
+# ceiling/floor effects (like the pilot in the original plan). "full" = registered study.
+profiles:
+  # Synthetic exploratory run at full study scale (offline, simulated models, dev seed).
+  mock:
+    items: &full_items {syllogism: 120, conditional: 80, crt: 30, easy_math: 200, hard_deduction: 300, logic_creative: 40, catch: 24}
+    benchmarks: &full_bench {folio: 200, logiqa: 300, gsm8k: 300, mmlu: 400}
+    solvers: mock
+    assistants: mock
+    world: amplify          # planted effect: logic raises error-catching
+    item_set: dev
+  mock_null:
+    items: *full_items
+    benchmarks: *full_bench
+    solvers: mock
+    assistants: mock
+    world: "null"           # no effect: error-catching does not depend on logic
+    item_set: dev
+  mock_quick:               # small offline smoke test (about 1 minute)
+    items: {syllogism: 36, conditional: 24, crt: 12, easy_math: 40, hard_deduction: 60, logic_creative: 8, catch: 12}
+    benchmarks: {folio: 30, logiqa: 30, gsm8k: 30, mmlu: 60}
+    solvers: mock
+    assistants: mock
+    world: amplify
+    item_set: dev
+  pilot:                    # real models, dev items: timing, parsing, ceiling/floor
+    items: {syllogism: 36, conditional: 24, crt: 12, easy_math: 40, hard_deduction: 60, logic_creative: 8, catch: 12}
+    benchmarks: {folio: 40, logiqa: 40, gsm8k: 40, mmlu: 80}
+    solvers: real
+    assistants: real
+    solver_limit: 6
+    item_set: dev
+  full:                     # the registered study; refuses to run unless MATCHES_FREEZE
+    items: *full_items
+    benchmarks: *full_bench
+    solvers: real
+    assistants: real
+    item_set: registered
+
+# Hugging Face dataset revisions. Leave empty to resolve and record at run time;
+# fill in before the full run so the exact data are pinned.
+benchmark_revisions: {folio: "", logiqa: "", gsm8k: "", mmlu: ""}
+
+# The assistant AIs (decision 5: Llama primary, Qwen replication).
+# Each has a primary route and a backup route; the run manifest records which one answered.
+assistants:
+  - {alias: llama-3.3-70b, provider: groq, model_id: llama-3.3-70b-versatile,
+     fallback_provider: openrouter, fallback_model_id: "meta-llama/llama-3.3-70b-instruct:free", params_b: 70,
+     ollama_tag: "llama3.3:70b"}
+  - {alias: qwen-2.5-72b, provider: openrouter, model_id: "qwen/qwen-2.5-72b-instruct:free",
+     fallback_provider: huggingface, fallback_model_id: "Qwen/Qwen2.5-72B-Instruct", params_b: 72,
+     ollama_tag: "qwen2.5:72b"}
+
+# The 28 solver models: open weights, a wide spread of sizes and families.
+# Small models run locally with Ollama (free); larger ones can use an API route.
+# params_b = billions of parameters (used as a control, decision 8).
+solvers:
+  - {alias: smollm2-360m, provider: ollama, model_id: "smollm2:360m", params_b: 0.36, family: smollm}
+  - {alias: qwen2.5-0.5b, provider: ollama, model_id: "qwen2.5:0.5b", params_b: 0.5, family: qwen}
+  - {alias: llama3.2-1b, provider: ollama, model_id: "llama3.2:1b", params_b: 1.2, family: llama}
+  - {alias: falcon3-1b, provider: ollama, model_id: "falcon3:1b", params_b: 1.7, family: falcon}
+  - {alias: tinyllama-1.1b, provider: ollama, model_id: "tinyllama:1.1b", params_b: 1.1, family: tinyllama}
+  - {alias: qwen2.5-1.5b, provider: ollama, model_id: "qwen2.5:1.5b", params_b: 1.5, family: qwen}
+  - {alias: smollm2-1.7b, provider: ollama, model_id: "smollm2:1.7b", params_b: 1.7, family: smollm}
+  - {alias: gemma2-2b, provider: ollama, model_id: "gemma2:2b", params_b: 2.6, family: gemma}
+  - {alias: granite3.1-2b, provider: ollama, model_id: "granite3.1-dense:2b", params_b: 2.5, family: granite}
+  - {alias: qwen2.5-3b, provider: ollama, model_id: "qwen2.5:3b", params_b: 3.1, family: qwen}
+  - {alias: llama3.2-3b, provider: ollama, model_id: "llama3.2:3b", params_b: 3.2, family: llama}
+  - {alias: falcon3-3b, provider: ollama, model_id: "falcon3:3b", params_b: 3.2, family: falcon}
+  - {alias: phi3.5-3.8b, provider: ollama, model_id: "phi3.5:3.8b", params_b: 3.8, family: phi}
+  - {alias: qwen2.5-7b, provider: ollama, model_id: "qwen2.5:7b", params_b: 7.6, family: qwen}
+  - {alias: mistral-7b, provider: ollama, model_id: "mistral:7b", params_b: 7.2, family: mistral}
+  - {alias: olmo2-7b, provider: ollama, model_id: "olmo2:7b", params_b: 7.3, family: olmo}
+  - {alias: falcon3-7b, provider: ollama, model_id: "falcon3:7b", params_b: 7.5, family: falcon}
+  - {alias: llama3.1-8b, provider: groq, model_id: llama-3.1-8b-instant,
+     fallback_provider: ollama, fallback_model_id: "llama3.1:8b", params_b: 8.0, family: llama}
+  - {alias: granite3.1-8b, provider: ollama, model_id: "granite3.1-dense:8b", params_b: 8.2, family: granite}
+  - {alias: gemma2-9b, provider: ollama, model_id: "gemma2:9b", params_b: 9.2, family: gemma}
+  - {alias: falcon3-10b, provider: ollama, model_id: "falcon3:10b", params_b: 10.3, family: falcon}
+  - {alias: mistral-nemo-12b, provider: ollama, model_id: "mistral-nemo:12b", params_b: 12.2, family: mistral}
+  - {alias: olmo2-13b, provider: ollama, model_id: "olmo2:13b", params_b: 13.7, family: olmo}
+  - {alias: qwen2.5-14b, provider: ollama, model_id: "qwen2.5:14b", params_b: 14.7, family: qwen}
+  - {alias: phi4-14b, provider: ollama, model_id: "phi4:14b", params_b: 14.7, family: phi}
+  - {alias: mistral-small-24b, provider: openrouter, model_id: "mistralai/mistral-small-24b-instruct-2501:free",
+     fallback_provider: ollama, fallback_model_id: "mistral-small:24b", params_b: 23.6, family: mistral}
+  - {alias: gemma2-27b, provider: ollama, model_id: "gemma2:27b", params_b: 27.2, family: gemma}
+  - {alias: qwen2.5-32b, provider: ollama, model_id: "qwen2.5:32b", params_b: 32.8, family: qwen}
+
+concurrency: {groq: 2, openrouter: 2, huggingface: 2, ollama: 1, mock: 8}
