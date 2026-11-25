@@ -237,7 +237,128 @@ ATOM_TEXT = ["the red door is open", "the bell is ringing", "the lamp is lit",
              "the box is sealed", "the flag is raised", "the drum is beating"]
 
 
-def gen_hard_deduction(n: int, seed: int, n_atoms: int = 8, chain_len: int = 5) -> list[Item]:
+def gen_hard_deduction(n: int, seed: int, levels: list[dict] | None = None) -> list[Item]:
+    """Difficulty ladder (decision 15, v0.2.1). `n` items are split evenly over the
+    levels (any remainder goes to the highest levels). Level 1 is exactly the v0.2.0
+    puzzle (same ids, text, answers and SHA-256); levels 2+ have more statements,
+    longer chains and, from level 3 (decision 19), "either/or" steps that can only be
+    settled by checking both cases."""
+    levels = levels or HARD_LEVELS
+    k = len(levels)
+    counts = [n // k] * k
+    for j in range(n - sum(counts)):
+        counts[k - 1 - j] += 1
+    items: list[Item] = []
+    for lv, cnt in zip(levels, counts):
+        if not cnt:
+            continue
+        if int(lv["level"]) == 1:
+            items += _gen_hard_level1(cnt, seed, int(lv["n_atoms"]), int(lv["chain_len"]))
+        else:
+            items += _gen_hard_level(cnt, seed, int(lv["level"]), int(lv["n_atoms"]),
+                                     int(lv["chain_len"]), int(lv.get("case_splits", 0)))
+    return items
+
+
+# The registered ladder. Level 1 = v0.2.0 puzzle. Statements per item:
+# L1 8, L2 12, L3 ~17, L4 ~22 (chain steps 4 / 7 / 9+2 cases / 11+2x2 cases).
+HARD_LEVELS: list[dict] = [
+    {"level": 1, "n_atoms": 8, "chain_len": 5, "case_splits": 0},
+    {"level": 2, "n_atoms": 12, "chain_len": 8, "case_splits": 0},
+    {"level": 3, "n_atoms": 16, "chain_len": 10, "case_splits": 1},
+    {"level": 4, "n_atoms": 20, "chain_len": 12, "case_splits": 2},
+]
+
+# Extra statement texts for levels 2+ (level 1 keeps its original list so its items
+# stay byte-identical).
+ATOM_TEXT_MORE = ["the kettle is boiling", "the curtain is drawn", "the oven is hot",
+                  "the radio is playing", "the car is parked", "the light is green",
+                  "the phone is charging", "the shop is open", "the road is wet",
+                  "the cup is full", "the train is late", "the alarm is set",
+                  "the heater is on", "the printer is jammed", "the bridge is closed",
+                  "the boat is docked", "the screen is dark", "the pool is heated",
+                  "the stove is off", "the gate bell is silent", "the ladder is up",
+                  "the mailbox is empty", "the tent is pitched", "the kite is flying"]
+
+
+def _either(s: str) -> str:
+    """'(either A or B, or both)' inside a sentence reads better without brackets."""
+    return s.replace("(either ", "either ").replace(", or both)", ", or both")
+
+
+def _gen_hard_level(n: int, seed: int, level: int, n_atoms: int, chain_len: int,
+                    case_splits: int) -> list[Item]:
+    rng = random.Random(f"hard_deduction-L{level}-{seed}")
+    pool = ATOM_TEXT + ATOM_TEXT_MORE
+    targets = ["true", "false", "unknown"]
+    items: list[Item] = []
+    attempts = 0
+    n_split_atoms = 2 * case_splits
+    if chain_len + n_split_atoms > n_atoms:
+        raise ValueError("hard_deduction level: not enough atoms for chain and case splits")
+    lit = lambda a, p: L.V(a) if rng.random() < p else L.Not(L.V(a))  # noqa: E731
+    while len(items) < n:
+        attempts += 1
+        want = targets[len(items) % 3]
+        atoms = [f"x{k}" for k in range(n_atoms)]
+        text = dict(zip(atoms, rng.sample(pool, n_atoms)))
+        order = atoms[:]
+        rng.shuffle(order)
+        chain = order[:chain_len]
+        split_atoms = order[chain_len:chain_len + n_split_atoms]
+        rest = order[chain_len + n_split_atoms:]
+        split_at = set(rng.sample(range(1, chain_len), case_splits))
+        premises: list[L.Formula] = [lit(chain[0], 0.5)]
+        cur = premises[0]
+        si = 0
+        for k in range(1, chain_len):
+            nxt = lit(chain[k], 0.6)
+            if k in split_at:  # either/or step: cur -> (p or q); p -> nxt; q -> nxt
+                p_, q_ = lit(split_atoms[si], 0.7), lit(split_atoms[si + 1], 0.7)
+                si += 2
+                premises.append(L.Imp(cur, L.Or(p_, q_)))
+                for c in (p_, q_):
+                    premises.append(L.Imp(c, nxt) if rng.random() < 0.6
+                                    else L.Imp(L.neg(nxt), L.neg(c)))
+            else:
+                form = rng.random()
+                if form < 0.6:
+                    premises.append(L.Imp(cur, nxt))
+                elif form < 0.85:
+                    premises.append(L.Imp(L.neg(nxt), L.neg(cur)))
+                else:
+                    premises.append(L.Or(L.neg(cur), nxt))
+            cur = nxt
+        for a in rest:  # distractors, including affirming-the-consequent bait
+            b = rng.choice(chain)
+            premises.append(L.Imp(L.V(a), L.V(b)) if rng.random() < 0.5 else L.Imp(L.V(b), L.V(a)))
+        if want == "unknown":
+            query_atom = rng.choice(split_atoms + rest or chain)
+        else:
+            query_atom = chain[-1]
+        status = L.entailment_status_fast(premises, L.V(query_atom))
+        if status != want:
+            if attempts > 200000:
+                raise RuntimeError("hard_deduction generator stuck; check parameters")
+            continue
+        rng.shuffle(premises)
+        name = lambda v: text[v]  # noqa: E731
+        lines = [f"{j+1}. " + _either(_sentence(L.to_text(p, name))) for j, p in enumerate(premises)]
+        prompt = ("Read the statements. Assume all of them are true. Use strict logic only.\n\n"
+                  + "\n".join(lines) +
+                  f"\n\nQuestion: Is it true that {text[query_atom]}?\n"
+                  "Answer TRUE if it must be true, FALSE if it must be false, or UNKNOWN if the "
+                  "statements do not settle it.")
+        items.append(Item("hard_deduction", _id(f"hard_deduction-L{level}", len(items), seed), prompt,
+                          want.upper(), "choice", ["TRUE", "FALSE", "UNKNOWN"],
+                          {"level": level, "n_premises": len(premises), "chain_len": chain_len,
+                           "case_splits": case_splits,
+                           "premises": [repr(p) for p in premises], "query": query_atom,
+                           "atom_text": text}))
+    return items
+
+
+def _gen_hard_level1(n: int, seed: int, n_atoms: int = 8, chain_len: int = 5) -> list[Item]:
     """Facts + rules (with negations, disjunctions and distractors); the question is
     whether one statement is TRUE, FALSE, or UNKNOWN. Answer by exact model checking.
     Balanced across the three answers."""

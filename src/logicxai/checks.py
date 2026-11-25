@@ -73,6 +73,15 @@ PARSER_CASES: list[tuple[str, list[str] | None, Any]] = [
     ("FINAL: -7", None, -7),
     ("FINAL: 12.0", None, 12),
     ("No number here.", None, None),
+    # v0.2.1 (decision 16): lenient reading = last number on the FINAL line. These are
+    # real reply shapes from the 2026-11-07 pilot that the strict reader missed.
+    ("Step 1: 5 x 73 = 365\nFINAL: Tanya earned $365", None, 365),
+    ("FINAL: Tanya earned $365.", None, 365),
+    ("FINAL: The answer is 18 apples", None, 18),
+    ("FINAL: **$1,250**", None, 1250),
+    ("She has 3 boxes of 12.\nFINAL: 36 pens in total", None, 36),
+    ("FINAL: 7.5", None, 7.5),
+    ("FINAL: none\nSo 14 is left.", None, 14),
 ]
 FLAG_CASES = [("ASSISTANT_ERROR: YES\nFINAL: TRUE", True), ("assistant_error: no\nFINAL: A", False),
               ("ASSISTANT ERROR: Yes", True), ("FINAL: TRUE", None),
@@ -248,11 +257,14 @@ def self_checks(run_dir: Path, items: dict[str, list[dict]], assist_rows: list[d
     # C4 planted-error assignment re-derived
     hard = items.get("hard_deduction", [])
     re_plant: set[str] = set()
-    for ans in ("TRUE", "FALSE", "UNKNOWN"):
-        re_plant |= planted_set([i["item_id"] for i in hard if i["answer"] == ans], seed, error_rate)
-    balanced = all(abs(sum(i["item_id"] in plant for i in hard if i["answer"] == a)
-                       - error_rate * sum(i["answer"] == a for i in hard)) <= 0.5 for a in ("TRUE", "FALSE", "UNKNOWN"))
-    add("C4", "Planted-error assignment re-derived from item ids and seed (exact half per answer type)",
+    blocks = {(i["meta"].get("level", 1), i["answer"]) for i in hard}
+    for lv, ans in blocks:
+        re_plant |= planted_set([i["item_id"] for i in hard if i["answer"] == ans
+                                 and i["meta"].get("level", 1) == lv], seed, error_rate)
+    balanced = all(abs(sum(i["item_id"] in plant for i in hard if (i["meta"].get("level", 1), i["answer"]) == b)
+                       - error_rate * sum((i["meta"].get("level", 1), i["answer"]) == b for i in hard)) <= 0.5
+                   for b in blocks)
+    add("C4", "Planted-error assignment re-derived from item ids and seed (exact half per level and answer type)",
         re_plant == plant and balanced, f"{len(plant)} of {len(hard)} items planted")
 
     # C5 solver-level numbers recomputed from raw trials with a separate simple routine

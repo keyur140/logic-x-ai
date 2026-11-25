@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this study, its code or its data, please cite it as below."
 title: "Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance (Logic x AI)"
 type: software
-version: 0.2.0
-date-released: "2026-11-05"
+version: 0.2.1
+date-released: "2026-11-25"
 license: MIT
 authors:
   - given-names: "KEYUR SHAILESHKUMAR"

@@ -135,6 +135,45 @@ def entailment_status(premises: list[Formula], query: Formula) -> str:
     return "inconsistent"
 
 
+def _eval_np(f: Formula, cols: dict):
+    import numpy as np
+    op = f[0]
+    if op == "var":
+        return cols[f[1]]
+    if op == "not":
+        return ~_eval_np(f[1], cols)
+    if op == "and":
+        return _eval_np(f[1], cols) & _eval_np(f[2], cols)
+    if op == "or":
+        return _eval_np(f[1], cols) | _eval_np(f[2], cols)
+    if op == "imp":
+        return ~_eval_np(f[1], cols) | _eval_np(f[2], cols)
+    raise ValueError(op)
+
+
+def entailment_status_fast(premises: list[Formula], query: Formula) -> str:
+    """Same exact truth-table check as `entailment_status`, but evaluated over all
+    2^n assignments at once with numpy (v0.2.1: the harder levels have up to ~22
+    statements). Still brute-force model checking, so the key is provably right."""
+    import numpy as np
+    names = sorted(set().union(*(variables(p) for p in premises), variables(query)))
+    n = len(names)
+    if n > 24:
+        raise ValueError(f"too many atoms for exact checking: {n}")
+    idx = np.arange(2 ** n, dtype=np.uint32)
+    cols = {v: ((idx >> np.uint32(k)) & 1).astype(bool) for k, v in enumerate(names)}
+    ok = np.ones(2 ** n, dtype=bool)
+    for p in premises:
+        ok &= _eval_np(p, cols)
+        if not ok.any():
+            return "inconsistent"
+    q = _eval_np(query, cols)
+    can_true, can_false = bool((ok & q).any()), bool((ok & ~q).any())
+    if can_true and can_false:
+        return "unknown"
+    return "true" if can_true else "false"
+
+
 def entails(premises: list[Formula], query: Formula) -> bool:
     return entailment_status(premises, query) == "true"
 

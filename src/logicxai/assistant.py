@@ -24,7 +24,7 @@ import random
 from typing import Any
 
 from . import prompts as P
-from .llm import LLMClient, LLMError, ModelSpec
+from .llm import DailyCapReached, LLMClient, LLMError, ModelSpec
 from .provenance import sha256_text
 from .scoring import parse_choice, score_item
 
@@ -85,6 +85,8 @@ def assistant_reply(client: LLMClient, spec: ModelSpec, item: dict[str, Any], se
             content = P.ASSISTANT_SCRIPTED_CLEAN.format(prompt=item["prompt"], key=target) + retry
         try:
             r = client.chat(spec, msgs(content), purpose=f"assistant:{fam}:{'error' if planted else 'clean'}")
+        except DailyCapReached:
+            raise  # pause the run; never count a daily limit as a failed reply
         except LLMError as e:
             failures.append(f"api: {e}")
             continue

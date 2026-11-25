@@ -192,7 +192,10 @@ def run_analysis(scored_dir: str | Path, out_dir: str | Path, st: dict[str, Any]
     for a in assistants:
         if f"dprime__{a}" in sl:
             sl[f"dprime_z__{a}"] = _z(sl[f"dprime__{a}"])
-    xs = ["logic_z"] + COVS
+    # Decision 17 (v0.2.1): "thinking" (always-reasoning model) is a control when the
+    # roster has both kinds; with only one kind it is constant and left out.
+    covs = COVS + (["thinking"] if "thinking" in sl and 0 < sl["thinking"].fillna(0).mean() < 1 else [])
+    xs = ["logic_z"] + covs
 
     res: dict[str, Any] = {"unit": "solver = model x reasoning mode", "n_solvers": int(len(sl)),
                            "n_solver_units_total": int(len(sl_all)),
@@ -260,9 +263,9 @@ def run_analysis(scored_dir: str | Path, out_dir: str | Path, st: dict[str, Any]
         b["S8_behavioural_catch"] = regress(sl, f"behav_catch__{a}", xs)
         # ---- exploratory
         b["E1_H3_logical_creativity_originality"] = regress(
-            sl, f"gain_cr_orig__{a}", ["lc_z", "logic_z"] + COVS, test="lc_z",
+            sl, f"gain_cr_orig__{a}", ["lc_z", "logic_z"] + covs, test="lc_z",
             alternative="greater", reps=min(reps, 1999), seed=s + 8)
-        b["E2_H3_logical_creativity_valid"] = regress(sl, f"gain_cr_valid__{a}", ["lc_z", "logic_z"] + COVS)
+        b["E2_H3_logical_creativity_valid"] = regress(sl, f"gain_cr_valid__{a}", ["lc_z", "logic_z"] + covs)
         return b
 
     res["by_assistant"] = {a: block(a, seed + 100 * i) for i, a in enumerate(assistants)}

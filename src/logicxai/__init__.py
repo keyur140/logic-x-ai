@@ -7,7 +7,7 @@
 # License: MIT (see LICENSE)
 
 """Logic x AI: does logical reasoning predict who gains most from an AI assistant?"""
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 AUTHOR: dict = {
     "name": "KEYUR SHAILESHKUMAR PATEL",

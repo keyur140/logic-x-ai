@@ -57,8 +57,9 @@ def new_run_id() -> str:
     return f"{stamp}-{uuid.uuid4().hex[:8]}"
 
 
-def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+def utc_now(ts: float | None = None) -> str:
+    d = datetime.now(timezone.utc) if ts is None else datetime.fromtimestamp(ts, timezone.utc)
+    return d.isoformat(timespec="seconds")
 
 
 def _pip_freeze() -> list[str]:

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import time
 from dataclasses import dataclass
@@ -32,15 +33,38 @@ import requests
 
 from .provenance import canonical_json, sha256_json, sha256_text, utc_now
 
-PROVIDERS: dict[str, dict[str, str]] = {
-    "groq": {"base_url": "https://api.groq.com/openai/v1", "key_env": "GROQ_API_KEY"},
-    "openrouter": {"base_url": "https://openrouter.ai/api/v1", "key_env": "OPENROUTER_API_KEY"},
-    "huggingface": {"base_url": "https://router.huggingface.co/v1", "key_env": "HF_TOKEN"},
-    # OLLAMA_BASE_URL lets the same code use Ollama on another machine (e.g. a rented GPU)
+# key_envs: every environment variable that may hold a key for this provider, tried in
+# order (v0.2.1, decision 18: free tiers cap each key per day, so several keys rotate).
+PROVIDERS: dict[str, dict[str, Any]] = {
+    "groq": {"base_url": "https://api.groq.com/openai/v1",
+             "key_envs": ["GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3", "GROQ_API_KEY_4"]},
+    # Google AI Studio (free tier; Gemma open-weights models) through its OpenAI-compatible endpoint
+    "google": {"base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+               "key_envs": ["GOOGLE_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY_2"]},
+    "mistral": {"base_url": "https://api.mistral.ai/v1", "key_envs": ["MISTRAL_API_KEY", "MISTRAL_API_KEY_2"]},
+    "cerebras": {"base_url": "https://api.cerebras.ai/v1", "key_envs": ["CEREBRAS_API_KEY", "CEREBRAS_API_KEY_2"]},
+    "openrouter": {"base_url": "https://openrouter.ai/api/v1",
+                   "key_envs": ["OPENROUTER_API_KEY", "OPENROUTER_API_KEY_2"]},
+    "huggingface": {"base_url": "https://router.huggingface.co/v1", "key_envs": ["HF_TOKEN", "HF_TOKEN_2"]},
+    # OLLAMA_BASE_URL lets the same code use Ollama on another machine
     "ollama": {"base_url": os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/") + "/v1",
-               "key_env": ""},
-    "mock": {"base_url": "", "key_env": ""},  # offline test provider (see mock.py)
+               "key_envs": []},
+    "mock": {"base_url": "", "key_envs": []},  # offline test provider (see mock.py)
 }
+
+# Providers that do not accept every OpenAI field (the request still records what was sent).
+NO_SEED = {"google", "mistral"}
+
+USER_AGENT = "logicxai/0.2.1 (research study; python-requests)"
+
+# A 429 whose text matches this is a DAILY limit, not a per-minute one.
+DAILY_RE = re.compile(r"per day|\bTPD\b|\bRPD\b|daily|PerDay|quota exceeded|free-models-per-day", re.I)
+WAIT_RE = re.compile(r"try again in\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:([\d.]+)s)?", re.I)
+
+
+def key_names(provider: str) -> list[str]:
+    """Names (never values) of the key variables that are set for a provider."""
+    return [k for k in PROVIDERS[provider]["key_envs"] if os.environ.get(k)]
 
 
 def _atomic_write(path: Path, text: str) -> None:
@@ -53,6 +77,11 @@ def _atomic_write(path: Path, text: str) -> None:
 
 class LLMError(RuntimeError):
     pass
+
+
+class DailyCapReached(LLMError):
+    """Every key for this model has used its free daily allowance. The run pauses
+    (saved answers are kept in the cache) and continues when it is started again."""
 
 
 @dataclass(frozen=True)
@@ -85,6 +114,15 @@ class LLMClient:
         self.calls = 0
         self.cache_hits = 0
         self.mock_answer_key: dict = {}
+        # Daily-cap state: "provider|KEY_NAME|model" -> unix time when it may be tried again.
+        # Kept next to the cache so a paused run knows tomorrow which keys were spent.
+        self.budget_path = self.cache_dir / "_budget_state.json"
+        try:
+            self._spent: dict[str, float] = json.loads(self.budget_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            self._spent = {}
+        self.max_cap_wait = float(os.environ.get("LOGICXAI_MAX_CAP_WAIT", "900"))
+        self.keys_used: dict[str, int] = {}
 
     # ---------------------------------------------------------------- utils
     def _cache_file(self, req_hash: str) -> Path:
@@ -96,8 +134,24 @@ class LLMClient:
 
     @staticmethod
     def available(provider: str) -> bool:
-        env = PROVIDERS[provider]["key_env"]
-        return provider in ("ollama", "mock") or bool(env and os.environ.get(env))
+        return provider in ("ollama", "mock") or bool(key_names(provider))
+
+    def _mark_spent(self, slot: str, until: float) -> None:
+        with self._lock:
+            self._spent[slot] = until
+            _atomic_write(self.budget_path, json.dumps(self._spent, indent=1, sort_keys=True))
+
+    def _key_slots(self, provider: str, model_id: str) -> list[tuple[str, str]]:
+        """(KEY_NAME, slot) pairs for keys that are not spent right now."""
+        now = time.time()
+        if not PROVIDERS[provider]["key_envs"]:
+            return [("", f"{provider}||{model_id}")]
+        out = []
+        for k in key_names(provider):
+            slot = f"{provider}|{k}|{model_id}"
+            if self._spent.get(slot, 0) <= now:
+                out.append((k, slot))
+        return out
 
     # ----------------------------------------------------------------- main
     def chat(self, spec: ModelSpec, messages: list[dict[str, str]],
@@ -114,8 +168,16 @@ class LLMClient:
             try:
                 return self._chat_one(spec.alias, provider, model_id, messages,
                                       max_tokens + spec.token_allowance, purpose, dict(spec.extra))
+            except DailyCapReached as e:
+                # Default: wait for tomorrow rather than switch to another copy of the weights
+                # mid-run (e.g. a quantised local copy). LOGICXAI_CAP_FALLBACK=1 allows it.
+                last_err = e
+                if os.environ.get("LOGICXAI_CAP_FALLBACK") != "1":
+                    raise
             except LLMError as e:
                 last_err = e
+        if isinstance(last_err, DailyCapReached):
+            raise last_err
         raise LLMError(f"{spec.alias}: all routes failed: {last_err}")
 
     def _chat_one(self, alias: str, provider: str, model_id: str,
@@ -155,28 +217,44 @@ class LLMClient:
             return {**result, "cached": False}
 
         cfg = PROVIDERS[provider]
-        headers = {"Content-Type": "application/json"}
-        if cfg["key_env"]:
-            headers["Authorization"] = f"Bearer {os.environ[cfg['key_env']]}"
         url = cfg["base_url"] + "/chat/completions"
+        send = {k: v for k, v in body.items() if not (k == "seed" and provider in NO_SEED)}
 
+        slots = self._key_slots(provider, model_id)
+        if not slots:
+            raise DailyCapReached(f"{provider}/{model_id}: every key has used its free daily limit")
         delay = 2.0
-        for attempt in range(1, self.max_retries + 1):
+        attempt = 0
+        while attempt < self.max_retries:
+            if not slots:
+                raise DailyCapReached(f"{provider}/{model_id}: every key has used its free daily limit")
+            key_name, slot = slots[0]
+            headers = {"Content-Type": "application/json", "User-Agent": USER_AGENT}
+            if key_name:
+                headers["Authorization"] = f"Bearer {os.environ[key_name]}"
+            attempt += 1
             t0 = time.time()
             try:
-                r = requests.post(url, headers=headers, json=body, timeout=self.timeout)
+                r = requests.post(url, headers=headers, json=send, timeout=self.timeout)
             except requests.RequestException as e:
                 err = f"network: {e}"
             else:
                 if r.status_code == 200:
-                    payload = r.json()
                     try:
-                        text = payload["choices"][0]["message"]["content"] or ""
-                    except (KeyError, IndexError, TypeError):
-                        err = f"bad payload: {str(payload)[:200]}"
+                        payload = r.json()
+                        raw = payload["choices"][0]["message"]["content"] or ""
+                    except (KeyError, IndexError, TypeError, ValueError):
+                        err = f"bad payload: {r.text[:200]}"
                     else:
+                        # v0.2.1: always-thinking models (e.g. Gemma 4 on Google) put their
+                        # reasoning in <thought>...</thought> inside the reply. It is kept in the
+                        # cache and log but never scored and never shown to a solver (an
+                        # assistant's thoughts could reveal a planted error).
+                        text, thought = strip_thoughts(raw)
                         result = {
                             "text": text,
+                            "thought_text": thought,
+                            "raw_sha256": sha256_text(raw),
                             "alias": alias,
                             "provider": provider,
                             "model_requested": model_id,
@@ -188,27 +266,80 @@ class LLMClient:
                             "timestamp_utc": utc_now(),
                         }
                         _atomic_write(cf, canonical_json(result))
-                        self.calls += 1
-                        self._log({**{k: v for k, v in result.items() if k != "text"},
-                                   "purpose": purpose, "attempt": attempt,
+                        with self._lock:
+                            self.calls += 1
+                            self.keys_used[key_name or provider] = self.keys_used.get(key_name or provider, 0) + 1
+                        self._log({**{k: v for k, v in result.items() if k not in ("text", "thought_text")},
+                                   "purpose": purpose, "attempt": attempt, "key_name": key_name,
                                    "latency_s": round(time.time() - t0, 3), "status": "ok"})
                         return {**result, "cached": False}
-                retryable = r.status_code in (408, 409, 425, 429, 500, 502, 503, 504)
-                err = f"HTTP {r.status_code}: {r.text[:200]}"
-                if not retryable:
-                    self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
-                               "purpose": purpose, "status": "error", "error": err,
-                               "timestamp_utc": utc_now()})
-                    raise LLMError(err)
-                ra = r.headers.get("retry-after")
-                if ra:
-                    try:
-                        delay = max(delay, float(ra))
-                    except ValueError:
-                        pass
+                else:
+                    err = f"HTTP {r.status_code}: {r.text[:300]}"
+                    if r.status_code == 429 and DAILY_RE.search(r.text or ""):
+                        wait = _parse_wait(r.text)
+                        if wait is not None and wait <= self.max_cap_wait:
+                            # rolling daily window that frees up soon: wait, same key
+                            self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
+                                       "purpose": purpose, "status": "cap_wait", "key_name": key_name,
+                                       "wait_s": wait, "error": err[:200], "timestamp_utc": utc_now()})
+                            time.sleep(wait + 1)
+                            attempt -= 1  # a short wait is not a failed try
+                            continue
+                        until = time.time() + (wait if wait is not None else 3600)
+                        self._mark_spent(slot, until)
+                        self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
+                                   "purpose": purpose, "status": "daily_cap", "key_name": key_name,
+                                   "retry_after_utc": utc_now(until), "error": err[:200],
+                                   "timestamp_utc": utc_now()})
+                        slots = slots[1:]  # rotate to the next key
+                        attempt -= 1
+                        continue
+                    if r.status_code in (401, 403) and len(slots) > 1:
+                        # this key is invalid or expired: try the next one
+                        self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
+                                   "purpose": purpose, "status": "key_rejected", "key_name": key_name,
+                                   "error": err[:200], "timestamp_utc": utc_now()})
+                        self._mark_spent(slot, time.time() + 6 * 3600)
+                        slots = slots[1:]
+                        attempt -= 1
+                        continue
+                    retryable = r.status_code in (408, 409, 425, 429, 500, 502, 503, 504)
+                    if not retryable:
+                        self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
+                                   "purpose": purpose, "status": "error", "key_name": key_name,
+                                   "error": err, "timestamp_utc": utc_now()})
+                        raise LLMError(err)
+                    ra = r.headers.get("retry-after")
+                    if ra:
+                        try:
+                            delay = max(delay, float(ra))
+                        except ValueError:
+                            pass
             self._log({"alias": alias, "provider": provider, "request_sha256": req_hash,
-                       "purpose": purpose, "status": "retry", "attempt": attempt,
+                       "purpose": purpose, "status": "retry", "attempt": attempt, "key_name": key_name,
                        "error": err, "timestamp_utc": utc_now()})
-            time.sleep(min(delay, self.max_sleep))
-            delay *= 2
+            if attempt < self.max_retries:
+                time.sleep(min(delay, self.max_sleep))
+                delay *= 2
         raise LLMError(f"{provider}/{model_id}: gave up after {self.max_retries} tries")
+
+
+THOUGHT_RE = re.compile(r"<(thought|think|thinking)>(.*?)(?:</\1>|$)", re.S | re.I)
+
+
+def strip_thoughts(raw: str) -> tuple[str, str | None]:
+    """Split a reply into (answer text, hidden reasoning). An unclosed tag (reply cut off
+    while thinking) counts as all reasoning, so a draft answer inside it is never read."""
+    thoughts = [m.group(2) for m in THOUGHT_RE.finditer(raw or "")]
+    if not thoughts:
+        return raw, None
+    return THOUGHT_RE.sub("", raw).strip(), "\n".join(thoughts)
+
+
+def _parse_wait(text: str) -> float | None:
+    """'Please try again in 7m26.4s' -> 446.4 seconds (None if no time is given)."""
+    m = WAIT_RE.search(text or "")
+    if not m or not any(m.groups()):
+        return None
+    h, mi, sec = (float(g) if g else 0.0 for g in m.groups())
+    return h * 3600 + mi * 60 + sec

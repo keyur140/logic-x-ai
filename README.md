@@ -143,7 +143,7 @@ The research idea, research questions and every main design decision are the aut
 
 If you use this study, its code or its data, please cite:
 
-> PATEL, KEYUR SHAILESHKUMAR (2026). *Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance (Logic × AI)* (Version 0.2.0) [Computer software and preregistered study]. ORCID: https://orcid.org/0009-0008-5261-043X. Conducted independently; not an official Brunel University London project.
+> PATEL, KEYUR SHAILESHKUMAR (2026). *Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance (Logic × AI)* (Version 0.2.1) [Computer software and preregistered study]. ORCID: https://orcid.org/0009-0008-5261-043X. Conducted independently; not an official Brunel University London project.
 
 BibTeX:
 
@@ -152,7 +152,7 @@ BibTeX:
   author  = {PATEL, KEYUR SHAILESHKUMAR},
   title   = {Who gains most from AI? Logical reasoning as an amplifier of LLM-assisted performance (Logic x AI)},
   year    = {2026},
-  version = {0.2.0},
+  version = {0.2.1},
   note    = {ORCID: 0009-0008-5261-043X. Conducted independently; not an official Brunel University London project.}
 }
 ```

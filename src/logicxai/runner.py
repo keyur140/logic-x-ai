@@ -26,7 +26,7 @@ from . import AUTHOR, __version__
 from . import prompts as P
 from .assistant import assistant_reply, planted_set
 from .items import GENERATORS
-from .llm import LLMClient, LLMError, ModelSpec
+from .llm import DailyCapReached, LLMClient, LLMError, ModelSpec
 from .provenance import (canonical_json, environment_snapshot, new_run_id, sha256_file,
                          sha256_json, utc_now, write_sha256sums)
 from .scoring import parse_flag, score_creative, score_item
@@ -164,13 +164,17 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
         solvers, assistants = cfg["solvers"], cfg["assistants"]
         if prof.get("solver_limit"):
             solvers = solvers[: prof["solver_limit"]]
+        if prof.get("solver_aliases"):  # e.g. the v0.2.1 re-pilot: only models reachable for it
+            solvers = [s for s in solvers if s["alias"] in prof["solver_aliases"]]
     manifest["solvers"] = solvers
     manifest["assistants"] = assistants
     if not is_mock:
         tags = [_spec(d, "local").model_id for d in solvers + assistants
                 if route == "local" or d["provider"] == "ollama" or d.get("fallback_provider") == "ollama"]
         manifest["ollama_digests"] = _ollama_digests(sorted(set(tags)))
-    modes = st["modes"]
+    modes = prof.get("modes") or st["modes"]
+    if prof.get("analysis") is False:
+        skip_analysis = True
     client = LLMClient(cache_dir, run_dir / "logs" / "llm_calls.jsonl", seed=seed)
 
     # ----------------------------------------------------------- 1. items
@@ -229,8 +233,11 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
     task_items = [it for f in TASK_FAMILIES + ("catch",) for it in items.get(f, [])]
     hard = items.get("hard_deduction", [])
     plant: set[str] = set()
-    for ans in ("TRUE", "FALSE", "UNKNOWN"):  # exact half within each answer type
-        plant |= planted_set([it["item_id"] for it in hard if it["answer"] == ans], seed, st["error_rate"])
+    # exact half within each (difficulty level, answer type) block (v0.2.1: levels added)
+    for lv in sorted({it["meta"].get("level", 1) for it in hard}):
+        for ans in ("TRUE", "FALSE", "UNKNOWN"):
+            plant |= planted_set([it["item_id"] for it in hard if it["answer"] == ans
+                                  and it["meta"].get("level", 1) == lv], seed, st["error_rate"])
     manifest["planted_items"] = sorted(plant)
     assist: dict[str, dict[str, dict]] = defaultdict(dict)
     all_assist_rows: list[dict] = []
@@ -259,6 +266,10 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
             "models_reported": sorted({r.get("model_reported") or "" for r in rows} - {""}),
             "sha256": sha256_file(run_dir / "assistant" / f"{a['alias']}.jsonl"),
         }
+
+    n_def = sum(bool(r.get("deferred")) for r in all_assist_rows)
+    if n_def:
+        _pause(run_dir, manifest, client, t_start, f"{n_def} assistant replies wait for tomorrow's free limits")
 
     # ------------------------------------------------------- 3. solver trials
     jobs: list[dict[str, Any]] = []
@@ -297,6 +308,13 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
             log.info("trials %d / %d", done, len(jobs))
     for ex, _ in pools:
         ex.shutdown()
+    n_def = sum(r["status"] == "deferred" for r in trials)
+    if n_def:
+        manifest["stages"]["trials_progress"] = {"done": len(trials) - n_def, "waiting": n_def,
+                                                 "total": len(trials)}
+        _pause(run_dir, manifest, client, t_start,
+               f"{len(trials) - n_def} of {len(trials)} solver answers done; {n_def} wait for "
+               "tomorrow's free limits")
     trials.sort(key=lambda r: (r["solver"], r["mode"], r["family"], r["item_id"], r["condition"],
                                r["assistant"] or ""))
     _write_jsonl(run_dir / "raw" / "trials.jsonl", trials)
@@ -311,6 +329,13 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
 
     # ---------------------------------------- 4. exclusion gates + scored tables
     import pandas as pd
+    # Decision 17 (v0.2.1): an always-thinking model reasons at length whatever the mode
+    # prompt says, so its three modes are pooled into ONE solver unit (mode "pooled").
+    # raw/trials.jsonl keeps the real mode of every answer.
+    thinking = {s["alias"] for s in solvers if s.get("thinking")}
+    manifest["thinking_models"] = sorted(thinking)
+    trials = [({**t, "mode": "pooled", "mode_run": t["mode"]} if t["solver"] in thinking else t)
+              for t in trials]
     tdf = pd.DataFrame([{k: v for k, v in t.items() if k not in ("text", "creative")} for t in trials])
     excl = gate_solvers(tdf)
     excl.to_csv(run_dir / "scored" / "exclusions.csv", index=False)
@@ -353,15 +378,46 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
     return run_dir
 
 
+def _pause(run_dir: Path, manifest: dict[str, Any], client: LLMClient, t_start: float, why: str) -> None:
+    """Stop cleanly when the free daily limits are used up. Every answer so far is in the
+    cache; running the same command again (same --run-id) continues where it stopped."""
+    manifest["status"] = "paused_daily_limit"
+    manifest["paused_utc"] = utc_now()
+    manifest["pause_reason"] = why
+    manifest["keys_used_this_session"] = client.keys_used
+    manifest["llm_calls_new"] = client.calls
+    manifest["llm_cache_hits"] = client.cache_hits
+    manifest["resume_command"] = (f"python -m logicxai run --profile {manifest['profile']} "
+                                  f"--run-id {manifest['run_id']}")
+    (run_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    log.warning("PAUSED: %s. Answers so far are saved. Continue later with: %s", why,
+                manifest["resume_command"])
+    for h in list(log.handlers):
+        h.flush()
+        h.close()
+        log.removeHandler(h)
+    raise SystemExit(3)
+
+
 def _safe_assistant(client, spec, item, seed, planted):
     try:
         return assistant_reply(client, spec, item, seed, planted)
+    except DailyCapReached as e:
+        return {"assistant": spec.alias, "item_id": item["item_id"], "family": item["family"],
+                "ok": False, "deferred": True, "planted": False, "text": None, "failures": [str(e)]}
     except LLMError as e:
         return {"assistant": spec.alias, "item_id": item["item_id"], "family": item["family"],
                 "ok": False, "planted": False, "text": None, "failures": [str(e)]}
 
 
-LEAK_RE = re.compile(r"correct answer is|planted|subtle slip|deliberate|for a study", re.I)
+LEAK_RE = re.compile(r"\b(?:correct answer is|planted|subtle slip|deliberate(?:ly)?|for a study)\b", re.I)
+
+
+def _leak_scan_text(content: str, item_prompt: str) -> str:
+    """C9 scans only the text the study adds around the item (assistant reply and our
+    instructions), never the item itself. v0.2.1 fix: a FOLIO item that happens to
+    contain the word "deliberate" raised a false alarm in the 2026-11-07 pilot."""
+    return content.replace(item_prompt, "", 1)
 
 
 def _run_trial(client: LLMClient, job: dict[str, Any], st: dict[str, Any], run_id: str,
@@ -390,11 +446,14 @@ def _run_trial(client: LLMClient, job: dict[str, Any], st: dict[str, Any], run_i
         "condition": "assisted" if ar else "alone", "assistant": ar["assistant"] if ar else None,
         "planted": bool(ar and ar.get("planted")), "assistant_error_present":
             (ar.get("error_present") if ar else None),
-        "prompt_sha256": sha256_json(msgs), "prompt_leak": bool(LEAK_RE.search(content)),
+        "prompt_sha256": sha256_json(msgs), "prompt_leak": bool(LEAK_RE.search(_leak_scan_text(content, it["prompt"]))),
         "content": it["meta"].get("content"), "belief_conflict": it["meta"].get("belief_conflict"),
     }
     try:
         r = client.chat(_spec(s, route), msgs, max_tokens=max_tok, purpose=f"solver:{fam}:{row['condition']}")
+    except DailyCapReached as e:
+        return {**row, "status": "deferred", "error": str(e), "parsed": False, "correct": None,
+                "pred": None, "flag": None, "text": None}
     except LLMError as e:
         return {**row, "status": "error", "error": str(e), "parsed": False, "correct": None,
                 "pred": None, "flag": None, "text": None}

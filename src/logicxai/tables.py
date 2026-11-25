@@ -89,11 +89,13 @@ def build_tables(trials: list[dict[str, Any]], solvers: list[dict], out_dir: str
     fams = {s["alias"]: s.get("family") for s in solvers}
     assistants = sorted(a for a in ok["assistant"].dropna().unique())
     synthetic_kind = {s["alias"]: s.get("synthetic_kind", "") for s in solvers}
+    thinking = {s["alias"]: int(bool(s.get("thinking"))) for s in solvers}
     rows = []
     for (solver, mode), g in ok.groupby(["solver", "mode"]):
         r: dict[str, Any] = {"solver": solver, "mode": mode, "solver_unit": f"{solver}|{mode}",
                              "synthetic_kind": synthetic_kind.get(solver, ""),
                              "model_family": fams.get(solver), "params_b": params.get(solver),
+                             "thinking": thinking.get(solver, 0),
                              "log_params": math.log10(params[solver]) if params.get(solver) else np.nan}
         alone = g[g["condition"] == "alone"]
         # ---- logic battery (moderator): mean of family accuracies, equal weights

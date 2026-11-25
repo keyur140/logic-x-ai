@@ -62,6 +62,15 @@ profiles:
     assistants: real
     solver_limit: 6
     item_set: dev
+  repilot:                  # v0.2.1 re-pilot: are the new hard levels hard enough? (dev items)
+    items: {hard_deduction: 96}        # 24 per level, 8 per answer per level
+    benchmarks: {}
+    solvers: real
+    assistants: real
+    solver_aliases: [allam-2-7b, gpt-oss-20b, qwen3.8-27b, gemma-4-26b]
+    modes: [direct, careful]           # the two ends of the reasoning scale, to save free quota
+    analysis: false                    # descriptive only: accuracy and error-flagging by level
+    item_set: dev
   full:                     # the registered study; refuses to run unless MATCHES_FREEZE
     items: *full_items
     benchmarks: *full_bench
@@ -69,29 +78,46 @@ profiles:
     assistants: real
     item_set: registered
 
-# Hugging Face dataset revisions. Leave empty to resolve and record at run time;
-# fill in before the full run so the exact data are pinned.
-benchmark_revisions: {folio: "", logiqa: "", gsm8k: "", mmlu: ""}
+# Hugging Face dataset revisions, pinned from the 2026-11-07 pilot (v0.2.1, fix 9: LogiQA
+# loads only from its parquet conversion branch).
+benchmark_revisions:
+  folio: 04c740613c4973cdecfce8b198d12dda85828e1d
+  logiqa: fa9f9918fa81eca088805c1395d7f592f7755ae0
+  gsm8k: 740312add88f781978c0658806c59bc2815b9866
+  mmlu: c30699e8356da336a370243923dbaf21066bb9fe
 
-# The assistant AIs (decision 5: Llama primary, Qwen replication).
-# Each has a primary route and a backup route; the run manifest records which one answered.
+# Hard-deduction difficulty ladder (decisions 15 and 19): fixed in code
+# (src/logicxai/items.py, HARD_LEVELS) so it is covered by the code SHA-256.
+#   level 1  8 statements, 4-step chain (= the v0.2.0 puzzle, unchanged)
+#   level 2  12 statements, 7-step chain
+#   level 3  16 statements, 9-step chain + 1 either/or step (both cases must be checked)
+#   level 4  20 statements, 11-step chain + 2 either/or steps
+# hard_deduction items are split evenly over the 4 levels; planted errors are exactly
+# half of each (level x answer) block.
+
+# The assistant AIs (decision 21, v0.2.1). Groq retired Llama 3.3 70B, so:
+# primary  = gpt-oss-120b on Groq (free; passed the pilot manipulation checks 118/120)
+# replication = Gemma 4 31B on Google AI Studio (free; open weights)
 assistants:
-  - {alias: llama-3.3-70b, provider: groq, model_id: llama-3.3-70b-versatile,
-     fallback_provider: openrouter, fallback_model_id: "meta-llama/llama-3.3-70b-instruct:free", params_b: 70,
-     ollama_tag: "llama3.3:70b"}
-  - {alias: qwen-2.5-72b, provider: openrouter, model_id: "qwen/qwen-2.5-72b-instruct:free",
-     fallback_provider: huggingface, fallback_model_id: "Qwen/Qwen2.5-72B-Instruct", params_b: 72,
-     ollama_tag: "qwen2.5:72b"}
+  - {alias: gpt-oss-120b, provider: groq, model_id: openai/gpt-oss-120b, params_b: 117,
+     extra: {reasoning_effort: low}, token_allowance: 512, ollama_tag: "gpt-oss:120b"}
+  - {alias: gemma-4-31b, provider: google, model_id: gemma-4-31b-it, params_b: 31,
+     token_allowance: 1024, ollama_tag: "gemma4:31b"}   # always thinks; thoughts are stripped
 
-# The 28 solver models: open weights, a wide spread of sizes and families.
-# Small models run locally with Ollama (free); larger ones can use an API route.
-# params_b = billions of parameters (used as a control, decision 8).
+# The 28 solver models (decision 20, v0.2.1): open weights, a wide spread of sizes.
+# Free APIs only, no paid or rented hardware (decision 18):
+#   * models up to ~14B run FREE on your own computer with Ollama (no free API offers
+#     them with enough daily allowance); 8 GB RAM covers up to ~8B, 16 GB up to ~14B.
+#   * larger models run on free API tiers (Groq, Google AI Studio, Mistral), with an
+#     Ollama copy as backup where one exists. Run `python -m logicxai check` first.
+# params_b = billions of parameters (control, decision 8).
+# thinking: true = the model always reasons at length whatever the mode prompt says;
+# its 3 modes are pooled into ONE solver and "thinking" is a control (decision 17).
 solvers:
+  # ---- on your computer (Ollama), 22 models
   - {alias: smollm2-360m, provider: ollama, model_id: "smollm2:360m", params_b: 0.36, family: smollm}
   - {alias: qwen2.5-0.5b, provider: ollama, model_id: "qwen2.5:0.5b", params_b: 0.5, family: qwen}
   - {alias: llama3.2-1b, provider: ollama, model_id: "llama3.2:1b", params_b: 1.2, family: llama}
-  - {alias: falcon3-1b, provider: ollama, model_id: "falcon3:1b", params_b: 1.7, family: falcon}
-  - {alias: tinyllama-1.1b, provider: ollama, model_id: "tinyllama:1.1b", params_b: 1.1, family: tinyllama}
   - {alias: qwen2.5-1.5b, provider: ollama, model_id: "qwen2.5:1.5b", params_b: 1.5, family: qwen}
   - {alias: smollm2-1.7b, provider: ollama, model_id: "smollm2:1.7b", params_b: 1.7, family: smollm}
   - {alias: gemma2-2b, provider: ollama, model_id: "gemma2:2b", params_b: 2.6, family: gemma}
@@ -104,18 +130,32 @@ solvers:
   - {alias: mistral-7b, provider: ollama, model_id: "mistral:7b", params_b: 7.2, family: mistral}
   - {alias: olmo2-7b, provider: ollama, model_id: "olmo2:7b", params_b: 7.3, family: olmo}
   - {alias: falcon3-7b, provider: ollama, model_id: "falcon3:7b", params_b: 7.5, family: falcon}
-  - {alias: llama3.1-8b, provider: groq, model_id: llama-3.1-8b-instant,
-     fallback_provider: ollama, fallback_model_id: "llama3.1:8b", params_b: 8.0, family: llama}
+  - {alias: llama3.1-8b, provider: ollama, model_id: "llama3.1:8b", params_b: 8.0, family: llama}
   - {alias: granite3.1-8b, provider: ollama, model_id: "granite3.1-dense:8b", params_b: 8.2, family: granite}
   - {alias: gemma2-9b, provider: ollama, model_id: "gemma2:9b", params_b: 9.2, family: gemma}
   - {alias: falcon3-10b, provider: ollama, model_id: "falcon3:10b", params_b: 10.3, family: falcon}
-  - {alias: mistral-nemo-12b, provider: ollama, model_id: "mistral-nemo:12b", params_b: 12.2, family: mistral}
   - {alias: olmo2-13b, provider: ollama, model_id: "olmo2:13b", params_b: 13.7, family: olmo}
   - {alias: qwen2.5-14b, provider: ollama, model_id: "qwen2.5:14b", params_b: 14.7, family: qwen}
   - {alias: phi4-14b, provider: ollama, model_id: "phi4:14b", params_b: 14.7, family: phi}
-  - {alias: mistral-small-24b, provider: openrouter, model_id: "mistralai/mistral-small-24b-instruct-2501:free",
-     fallback_provider: ollama, fallback_model_id: "mistral-small:24b", params_b: 23.6, family: mistral}
-  - {alias: gemma2-27b, provider: ollama, model_id: "gemma2:27b", params_b: 27.2, family: gemma}
-  - {alias: qwen2.5-32b, provider: ollama, model_id: "qwen2.5:32b", params_b: 32.8, family: qwen}
+  # ---- on free API tiers, 6 models
+  - {alias: allam-2-7b, provider: groq, model_id: allam-2-7b, params_b: 7.0, family: allam}
+  - {alias: mistral-nemo-12b, provider: mistral, model_id: open-mistral-nemo-2407, params_b: 12.2,
+     family: mistral, fallback_provider: ollama, fallback_model_id: "mistral-nemo:12b"}
+  - {alias: gpt-oss-20b, provider: groq, model_id: openai/gpt-oss-20b, params_b: 21.0, family: gpt-oss,
+     thinking: true, extra: {reasoning_effort: low}, token_allowance: 512}
+  - {alias: mistral-small-24b, provider: mistral, model_id: mistral-small-2501, params_b: 23.6,
+     family: mistral, fallback_provider: ollama, fallback_model_id: "mistral-small:24b"}
+  - {alias: gemma-4-26b, provider: google, model_id: gemma-4-26b-a4b-it, params_b: 26.0, family: gemma,
+     thinking: true, token_allowance: 1024}   # Google offers no switch to turn its thinking off
+  - {alias: qwen3.8-27b, provider: groq, model_id: qwen/qwen3.8-27b, params_b: 27.0, family: qwen,
+     extra: {reasoning_effort: none}}
 
-concurrency: {groq: 2, openrouter: 2, huggingface: 2, ollama: 1, mock: 8}
+concurrency: {groq: 3, google: 2, mistral: 1, cerebras: 2, openrouter: 1, huggingface: 2, ollama: 1, mock: 8}
+
+# Free-tier allowances used by `python -m logicxai plan` to estimate how many days the
+# run takes. ESTIMATES: check each provider's console, they change. Per key, per model.
+free_tier_limits:
+  groq: {requests_per_day: 1000, tokens_per_day: 200000}
+  google: {requests_per_day: 1400, tokens_per_minute: 15000}
+  mistral: {requests_per_second: 1, tokens_per_month: 1000000000}
+  ollama: {tokens_per_second_7b: 10}   # your computer; scaled by model size

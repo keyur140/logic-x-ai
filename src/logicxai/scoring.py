@@ -45,17 +45,37 @@ def parse_choice(text: str, choices: list[str]) -> str | None:
     return best
 
 
-def parse_int(text: str) -> int | None:
-    m = FINAL_RE.findall(text or "")
-    cands = m or re.findall(r"-?\d[\d,]*(?:\.\d+)?", text or "")
-    for c in reversed(cands):
-        c = c.replace(",", "")
-        try:
-            v = float(c)
-        except ValueError:
-            continue
-        if v.is_integer():
-            return int(v)
+FINAL_LINE_RE = re.compile(r"FINAL\s*[:=](.*)$", re.I | re.M)
+NUMBER_RE = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
+
+
+def _to_number(c: str) -> int | float | None:
+    c = c.replace(",", "").rstrip(".")
+    try:
+        v = float(c)
+    except ValueError:
+        return None
+    return int(v) if v.is_integer() else v
+
+
+def parse_int(text: str) -> int | float | None:
+    """Number answers (decision 16, v0.2.1: lenient reading).
+
+    1. If there is a FINAL line, the answer is the LAST number on the last FINAL line,
+       whatever words surround it ("FINAL: Tanya earned $365." -> 365).
+    2. With no FINAL line (or no number on it), the last number in the reply.
+    A non-whole number is returned as is (read, but it cannot match a whole-number key)."""
+    text = text or ""
+    lines = FINAL_LINE_RE.findall(text)
+    for line in reversed(lines):
+        nums = NUMBER_RE.findall(line)
+        if nums:
+            return _to_number(nums[-1])
+    nums = NUMBER_RE.findall(text)
+    for c in reversed(nums):
+        v = _to_number(c)
+        if v is not None:
+            return v
     return None
 
 

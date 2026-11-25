@@ -22,6 +22,8 @@ echo == 2. Offline pipeline test
 python -m logicxai run --profile mock_quick || exit /b 1
 echo == 3. Which models answer
 python -m logicxai check
-echo == 4. Study run (%PROFILE%)
-python -m logicxai run --profile %PROFILE%
+echo == 4. Time estimate
+python -m logicxai plan --profile %PROFILE%
+echo == 5. Study run (%PROFILE%)
+python -m logicxai run --profile %PROFILE% --until-done
 echo Reports are in runs\<run id>\reports\

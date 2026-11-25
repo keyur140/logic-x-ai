@@ -8,10 +8,12 @@
 
 """Command line: python -m logicxai <command>
 
-  run       --profile mock|mock_null|mock_quick|pilot|full [--route api|local]
+  run       --profile mock|mock_null|mock_quick|pilot|repilot|full [--route api|local]
+            [--run-id ID] [--until-done]   (--until-done waits out free daily limits)
   validate  pipeline validation: planted effect, no-effect world, false-positive rate
   verify    RUN_DIR                 check every file of a run against SHA256SUMS.txt
-  check                             ping every model once; record Ollama digests
+  check                             ping every model once (fast, parallel); record Ollama digests
+  plan      [--profile full]        estimate calls, tokens and days under the free limits
   items     --profile P --out DIR   only generate items (inspection / OSF upload)
   power                             power simulation used in the preregistration
   freeze                            hash every study file and the registered items (OSF)
@@ -25,7 +27,7 @@ import json
 import sys
 from pathlib import Path
 
-PROFILES = ["mock", "mock_null", "mock_quick", "pilot", "full"]
+PROFILES = ["mock", "mock_null", "mock_quick", "pilot", "repilot", "full"]
 
 
 def _load_env(path: str = ".env") -> None:
@@ -53,6 +55,10 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--cache", default=".cache/llm")
     r.add_argument("--route", default=None, choices=["api", "local"])
     r.add_argument("--run-id", default=None, help="reuse a run id to resume into the same folder")
+    r.add_argument("--until-done", action="store_true",
+                   help="when the free daily limits pause the run, wait and continue by itself")
+    r.add_argument("--wait-minutes", type=float, default=60.0,
+                   help="with --until-done: minutes to wait after a pause before trying again")
     va = sub.add_parser("validate")
     va.add_argument("--config", default="configs/study.yaml")
     va.add_argument("--out", default="runs")
@@ -62,6 +68,9 @@ def main(argv: list[str] | None = None) -> int:
     c = sub.add_parser("check")
     c.add_argument("--config", default="configs/study.yaml")
     c.add_argument("--route", default=None, choices=["api", "local"])
+    pl = sub.add_parser("plan")
+    pl.add_argument("--profile", default="full", choices=PROFILES)
+    pl.add_argument("--config", default="configs/study.yaml")
     i = sub.add_parser("items")
     i.add_argument("--profile", default="pilot", choices=PROFILES)
     i.add_argument("--config", default="configs/study.yaml")
@@ -77,9 +86,29 @@ def main(argv: list[str] | None = None) -> int:
 
     if a.cmd == "run":
         from .runner import run_study
-        out = run_study(a.config, a.profile, a.out, a.cache, a.run_id, route=a.route)
-        print(f"\nDone. Reports: {out / 'reports'}")
-        return 0
+        if not a.until_done:
+            out = run_study(a.config, a.profile, a.out, a.cache, a.run_id, route=a.route)
+            print(f"\nDone. Reports: {out / 'reports'}")
+            return 0
+        # v0.2.1 (decision 18): free tiers cap each key per day. Keep the same run id and
+        # continue from the saved answers after each pause until everything is answered.
+        import time
+        from .provenance import new_run_id
+        run_id = a.run_id or f"{new_run_id()}-{a.profile}"
+        attempt = 0
+        while True:
+            attempt += 1
+            try:
+                out = run_study(a.config, a.profile, a.out, a.cache, run_id, route=a.route)
+                print(f"\nDone. Reports: {out / 'reports'}")
+                return 0
+            except SystemExit as e:
+                if e.code != 3:
+                    raise
+                print(f"Paused (free daily limits), pass {attempt}. Waiting {a.wait_minutes:.0f} min, "
+                      f"then continuing run {run_id}. Safe to stop with Ctrl+C and re-run later with "
+                      f"--run-id {run_id}.", flush=True)
+                time.sleep(a.wait_minutes * 60)
     if a.cmd == "validate":
         from .validate import run_validation
         out = run_validation(a.config, a.out, a.sims)
@@ -92,6 +121,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if not probs else 1
     if a.cmd == "check":
         return _check(a.config, a.route)
+    if a.cmd == "plan":
+        from .plan import print_plan
+        return print_plan(a.config, a.profile)
     if a.cmd == "items":
         import yaml
         from .items import GENERATORS
@@ -140,32 +172,66 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _check(config: str, route: str | None) -> int:
+    """v0.2.1 fix 10: never hang. Each provider is probed once (5 s); models on a provider
+    that cannot be reached are reported at once; every model gets one short try (no long
+    retry waits), all in parallel."""
+    import os
     import tempfile
+    from concurrent.futures import ThreadPoolExecutor
+
+    import requests
     import yaml
-    from .llm import LLMClient, LLMError
+    from .llm import PROVIDERS, LLMClient, LLMError, key_names
     from .runner import _ollama_digests, _spec
     cfg = yaml.safe_load(Path(config).read_text(encoding="utf-8"))
     route = route or cfg.get("route", "api")
     tmp = Path(tempfile.mkdtemp())
-    client = LLMClient(tmp / "cache", tmp / "log.jsonl")
-    ok_all = True
-    tags = []
-    for role in ("assistants", "solvers"):
-        for d in cfg[role]:
-            spec = _spec(d, route)
-            if spec.provider == "ollama":
-                tags.append(spec.model_id)
-            try:
-                res = client.chat(spec, [{"role": "user", "content": "Reply with the word OK."}], max_tokens=5)
-                print(f"OK    {role[:-1]:9s} {d['alias']:22s} via {res['provider']} ({res['model_reported']})")
-            except LLMError as e:
-                ok_all = False
-                print(f"FAIL  {role[:-1]:9s} {d['alias']:22s} {str(e)[:120]}")
-    if tags:
+    os.environ.setdefault("LOGICXAI_MAX_SLEEP", "3")
+    client = LLMClient(tmp / "cache", tmp / "log.jsonl", max_retries=2, timeout=40)
+    rows = [(role[:-1], d, _spec(d, route)) for role in ("assistants", "solvers") for d in cfg[role]]
+
+    def reachable(prov: str) -> str:
+        if prov == "mock":
+            return ""
+        base = PROVIDERS[prov]["base_url"]
+        try:
+            requests.get(base.rsplit("/v1", 1)[0] if prov == "ollama" else base, timeout=5)
+            return ""
+        except requests.RequestException as e:
+            return f"cannot reach {base} ({type(e).__name__})"
+
+    provs = sorted({sp.provider for _, _, sp in rows} | {d.get("fallback_provider") for _, d, _ in rows} - {None})
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        reach = dict(zip(provs, ex.map(reachable, provs)))
+    print("Providers:")
+    for p in provs:
+        keys = "" if p in ("ollama", "mock") else f"  keys set: {', '.join(key_names(p)) or 'NONE'}"
+        print(f"  {p:12s} {'reachable' if not reach[p] else reach[p]}{keys}")
+
+    def one(row):
+        role, d, spec = row
+        if reach.get(spec.provider) and not (d.get("fallback_provider") and not reach.get(d["fallback_provider"])):
+            return f"FAIL  {role:9s} {d['alias']:22s} {reach[spec.provider]}", False
+        try:
+            res = client.chat(spec, [{"role": "user", "content": "Reply with the word OK."}], max_tokens=16)
+            return f"OK    {role:9s} {d['alias']:22s} via {res['provider']} ({res['model_reported']})", True
+        except LLMError as e:
+            return f"FAIL  {role:9s} {d['alias']:22s} {str(e)[:140]}", False
+
+    print("\nModels:")
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        results = list(ex.map(one, rows))
+    for line, _ in results:
+        print(line)
+    tags = sorted({sp.model_id for _, _, sp in rows if sp.provider == "ollama"}
+                  | {d["fallback_model_id"] for _, d, _ in rows if d.get("fallback_provider") == "ollama"})
+    if tags and not reach.get("ollama"):
         print("\nOllama digests (exact model fingerprints):")
-        for t, dg in _ollama_digests(sorted(set(tags))).items():
+        for t, dg in _ollama_digests(tags).items():
             print(f"  {t:28s} {dg}")
-    return 0 if ok_all else 1
+    n_fail = sum(not ok for _, ok in results)
+    print(f"\n{len(results) - n_fail} of {len(results)} models answered.")
+    return 0 if not n_fail else 1
 
 
 if __name__ == "__main__":
