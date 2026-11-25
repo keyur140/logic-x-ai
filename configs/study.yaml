@@ -72,6 +72,16 @@ profiles:
     modes: [direct, careful]           # the two ends of the reasoning scale, to save free quota
     analysis: false                    # descriptive only: accuracy and error-flagging by level
     item_set: dev
+  repilot_gemma:            # v0.2.1: Gemma 4 26B again with a larger thinking allowance (first try ran out of tokens)
+    items: {hard_deduction: 96}
+    benchmarks: {}
+    solvers: real
+    assistants: real
+    solver_aliases: [gemma-4-26b]
+    assistant_aliases: [gpt-oss-120b]
+    modes: [direct, careful]
+    analysis: false
+    item_set: dev
   repilot_assist:           # v0.2.1: can the replication assistant write clean and planted replies at every level?
     items: {hard_deduction: 96}
     benchmarks: {}
@@ -112,7 +122,7 @@ assistants:
   - {alias: gpt-oss-120b, provider: groq, model_id: openai/gpt-oss-120b, params_b: 117,
      extra: {reasoning_effort: low}, token_allowance: 512, ollama_tag: "gpt-oss:120b"}
   - {alias: gemma-4-31b, provider: google, model_id: gemma-4-31b-it, params_b: 31,
-     token_allowance: 1024, ollama_tag: "gemma4:31b"}   # always thinks; thoughts are stripped
+     token_allowance: 4096, ollama_tag: "gemma4:31b"}   # always thinks (1-3k tokens); thoughts are stripped
 
 # The 28 solver models (decision 20, v0.2.1): open weights, a wide spread of sizes.
 # Free APIs only, no paid or rented hardware (decision 18):
@@ -156,7 +166,7 @@ solvers:
   - {alias: mistral-small-24b, provider: mistral, model_id: mistral-small-2501, params_b: 23.6,
      family: mistral, fallback_provider: ollama, fallback_model_id: "mistral-small:24b"}
   - {alias: gemma-4-26b, provider: google, model_id: gemma-4-26b-a4b-it, params_b: 26.0, family: gemma,
-     thinking: true, token_allowance: 1024}   # Google offers no switch to turn its thinking off
+     thinking: true, token_allowance: 4096}   # Google offers no switch to turn its thinking off; it thinks 1-3k tokens
   - {alias: qwen3.8-27b, provider: groq, model_id: qwen/qwen3.8-27b, params_b: 27.0, family: qwen,
      extra: {reasoning_effort: none}}
 
