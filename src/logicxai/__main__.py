@@ -27,7 +27,7 @@ import json
 import sys
 from pathlib import Path
 
-PROFILES = ["mock", "mock_null", "mock_quick", "pilot", "repilot", "full"]
+PROFILES = ["mock", "mock_null", "mock_quick", "pilot", "repilot", "repilot_assist", "full"]
 
 
 def _load_env(path: str = ".env") -> None:

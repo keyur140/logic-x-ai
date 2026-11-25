@@ -164,8 +164,10 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
         solvers, assistants = cfg["solvers"], cfg["assistants"]
         if prof.get("solver_limit"):
             solvers = solvers[: prof["solver_limit"]]
-        if prof.get("solver_aliases"):  # e.g. the v0.2.1 re-pilot: only models reachable for it
+        if prof.get("solver_aliases") is not None:  # e.g. the v0.2.1 re-pilot: only models reachable for it
             solvers = [s for s in solvers if s["alias"] in prof["solver_aliases"]]
+        if prof.get("assistant_aliases") is not None:
+            assistants = [a for a in assistants if a["alias"] in prof["assistant_aliases"]]
     manifest["solvers"] = solvers
     manifest["assistants"] = assistants
     if not is_mock:
@@ -270,6 +272,18 @@ def run_study(config_path: str | Path, profile: str, out_root: str | Path = "run
     n_def = sum(bool(r.get("deferred")) for r in all_assist_rows)
     if n_def:
         _pause(run_dir, manifest, client, t_start, f"{n_def} assistant replies wait for tomorrow's free limits")
+
+    if not solvers:  # assistant-only check (profile repilot_assist): stop after the assistants
+        manifest["finished_utc"] = utc_now()
+        manifest["duration_s"] = round(time.time() - t_start, 1)
+        (run_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False),
+                                               encoding="utf-8")
+        for h in list(log.handlers):
+            h.flush()
+            h.close()
+            log.removeHandler(h)
+        write_sha256sums(run_dir)
+        return run_dir
 
     # ------------------------------------------------------- 3. solver trials
     jobs: list[dict[str, Any]] = []

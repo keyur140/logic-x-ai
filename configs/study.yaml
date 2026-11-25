@@ -68,8 +68,18 @@ profiles:
     solvers: real
     assistants: real
     solver_aliases: [allam-2-7b, gpt-oss-20b, qwen3.8-27b, gemma-4-26b]
+    assistant_aliases: [gpt-oss-120b]  # primary assistant; Gemma 4 is checked in repilot_assist
     modes: [direct, careful]           # the two ends of the reasoning scale, to save free quota
     analysis: false                    # descriptive only: accuracy and error-flagging by level
+    item_set: dev
+  repilot_assist:           # v0.2.1: can the replication assistant write clean and planted replies at every level?
+    items: {hard_deduction: 96}
+    benchmarks: {}
+    solvers: real
+    assistants: real
+    solver_aliases: []
+    assistant_aliases: [gemma-4-31b]
+    analysis: false
     item_set: dev
   full:                     # the registered study; refuses to run unless MATCHES_FREEZE
     items: *full_items
