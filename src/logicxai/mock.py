@@ -119,10 +119,14 @@ def _assistant(alias: str, user: str, key: object) -> str:
     if tgt:
         # Same template and length distribution for clean and planted replies, so
         # no surface cue gives the answer away (checked by gate G5).
-        n_steps = 2 + int(_u(alias, user, "steps") * 4)
-        steps = "\n".join(f"Step {i + 1}: apply statement {1 + int(_u(alias, user, str(i)) * 8)} "
-                          f"to what we have so far." for i in range(n_steps))
-        return f"{steps}\nSo the question is settled.\nFINAL: {tgt.group(1)}"
+        # v0.2.1: the fixed format the real assistants must follow (6 numbered steps,
+        # 450-800 characters), with a random length inside the band.
+        pad = int(_u(alias, user, "steps") * 4)
+        steps = "\n".join(f"{i + 1}. Apply statement {1 + int(_u(alias, user, str(i)) * 8)} "
+                          f"to what we have so far, which gives the next fact"
+                          + ", and nothing contradicts it" * (1 if i < pad else 0) + "."
+                          for i in range(6))
+        return f"{steps}\nFINAL: {tgt.group(1)}"
     if isinstance(key, int):
         ans = key if _u(alias, user, "nat") < 0.9 else key + 7
         return f"Working it out step by step.\nFINAL: {ans}"

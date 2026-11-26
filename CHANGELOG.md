@@ -18,7 +18,12 @@ Built from the real Groq pilot (2026-11-07 to 11-21) and the author's decisions 
 - **New profile:** `repilot` (hard items only, 4 free-API solvers, direct and careful modes); `scripts/repilot_summary.py`.
 - **Model list:** 22 local (Ollama) + 6 free-API solvers; assistants gpt-oss-120b and Gemma 4 31B.
 - **Fixes:** leak scan (C9) false alarm on item text; mediation guard; statsmodels pinned; benchmark revisions pinned.
-- Tests: 39 (was 22).
+- **Assistant reply shape (G5 fix):** scripted replies need 6 numbered steps and 450 to 800 characters
+  (`prompts.SCRIPT_STEPS`, `SCRIPT_CHARS`), up to 6 tries. Synthetic assistants follow the same shape.
+- **Re-pilot (2026-11-25/26)** on development items: `repilot`, `repilot_gemma` and `repilot_assist` profiles;
+  report in `docs/Repilot_Report_v021.pdf`.
+- Gemma 4 thinking allowance 4,096 tokens; request timeout settable (`LOGICXAI_TIMEOUT`).
+- Tests: 43 (was 22).
 
 ## 0.2.0 (2026-11-05)
 

@@ -31,7 +31,7 @@
 | "FINAL: Tanya earned $365" was marked unreadable | lenient number reading: last number on the FINAL line |
 | Always-thinking models ignore the mode prompt | `thinking` label: 3 modes pooled into one solver, plus a control |
 | Free keys ran out each day; Llama models retired | key rotation, pause and continue, `plan` command, new model list and assistants |
-| Leak check false alarm, H4 "supported" with 1 model, `check` hung, missing statsmodels | all fixed, each with a test (39 tests) |
+| Leak check false alarm, H4 "supported" with 1 model, `check` hung, missing statsmodels | all fixed, each with a test (41 tests) |
 
 Full list: [`CHANGELOG.md`](CHANGELOG.md) and [`DEVIATIONS.md`](DEVIATIONS.md) (D6 to D12).
 
@@ -73,7 +73,7 @@ Or run the steps one at a time:
 
 ```bash
 pip install -r requirements.txt && pip install -e .
-python -m pytest -q                         # 39 tests: keys, levels, parser, key rotation, freeze, validation
+python -m pytest -q                         # 41 tests: keys, levels, parser, key rotation, freeze, validation
 python -m logicxai run --profile mock_quick # 1-minute offline smoke test with simulated models
 python -m logicxai run --profile mock       # full-size synthetic run, planted-effect world (~3 min)
 python -m logicxai run --profile mock_null  # full-size synthetic run, no-effect world (~3 min)

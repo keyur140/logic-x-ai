@@ -59,7 +59,7 @@ Within-solver design. Each solver (model × reasoning mode) completes:
 2. **Benchmarks, alone**: FOLIO and LogiQA (convergent validity of the logic score), GSM8K (validity of the easy task). MMLU (knowledge control) is run once per model in direct mode, with logic and mathematics subjects removed so the control measures knowledge rather than reasoning.
 3. **Tasks, alone and with each assistant** (every item in every condition; language models have no memory between calls, so there are no order or carry-over effects):
    - *Easy, checkable:* multi-step arithmetic word problems with one integer answer. Assistant answers naturally.
-   - *Hard to verify:* rule-chain deduction puzzles at four difficulty levels, 75 items each: level 1, 8 statements (4-step chain plus distractor rules); level 2, 12 statements (7-step chain); level 3, 16 statements (9-step chain with one "either/or" step, which can only be settled by checking both cases); level 4, 20 statements (11-step chain with two "either/or" steps). Answer TRUE / FALSE / UNKNOWN, balanced within each level. The levels were added after the pilot showed a ceiling (strong models ≥ 90% on level 1); the analysis averages over levels, which every solver sees equally. Assistant reply is scripted: a correct solution (clean) or a confident solution with exactly one subtle logical slip that reaches a specified wrong answer (planted error).
+   - *Hard to verify:* rule-chain deduction puzzles at four difficulty levels, 75 items each: level 1, 8 statements (4-step chain plus distractor rules); level 2, 12 statements (7-step chain); level 3, 16 statements (9-step chain with one "either/or" step, which can only be settled by checking both cases); level 4, 20 statements (11-step chain with two "either/or" steps). Answer TRUE / FALSE / UNKNOWN, balanced within each level. The levels were added after the pilot showed a ceiling (strong models ≥ 90% on level 1); the analysis averages over levels, which every solver sees equally. Assistant reply is scripted: a correct solution (clean) or a confident solution with exactly one subtle logical slip that reaches a specified wrong answer (planted error). Both kinds must have the same shape: exactly 6 numbered one-sentence steps and 450 to 800 characters, so that length and step count do not reveal the planted error.
    - *Logical creativity (exploratory):* list up to 10 distinct valid conclusions from 4–5 premises.
    - *Catch items (known-answer check, 24 items, assisted only):* the statements give the answer outright and the assistant contradicts it. Used only for gate G6 (§5.7), never in the hypothesis tests.
 
@@ -95,7 +95,11 @@ Precision for a solver-level moderator depends on the number of solvers, not ite
 
 Each run also reports the minimum detectable H1 effect at 80% power from the observed standard error (`mde_H1_pp_per_sd` in `results.json`). In the synthetic planted-effect run it was 6.3 pp per SD.
 
-`[TO FILL after pilot]` Re-run the simulation with pilot variance estimates and report the updated power here.
+**Updated with pilot variance (2026-11-26).** The pilot (3 models on Groq, development items) gave larger spreads than assumed: hard-item error gain between-model SD 7 pp, within-model SD 11 pp; easy-item gain between-model SD 15 pp, within-model SD 37 pp (direct-mode easy maths gains of 55 to 90 pp). Re-running the same simulation with these values gives:
+- H1: 52% power at 3 pp per SD, 86% at 5 pp per SD, 99.7% at 8 pp per SD (one-sided α = .05). The study is therefore well powered for H1 effects of 5 pp per SD or more, and under-powered below about 4 pp per SD.
+- H2: the probability that the 90% CI falls within ±5 pp when the true slope is zero is about 2% (60% at ±10 pp, 95% at ±15 pp). With the pilot variance the ±5 pp equivalence test is not informative; how H2 is treated after this result is set in §1.3.
+
+The re-pilot of the difficulty ladder (`docs/Repilot_Report_v021.pdf`) confirmed that levels 3 and 4 pull the strongest pilot models off the ceiling (careful-mode accuracy alone 71% and 50% at level 4), which is what H1 needs.
 
 ### 3.5 Stopping rule
 Data collection stops when every solver has completed every registered trial, or when a model is unavailable on all routes after 6 retries with exponential backoff (then handled as in §5.4). Daily-limit pauses do not stop data collection. If a model is retired by its provider during the run and has no backup route, its solver units are reported as missing (§5.4) and not replaced.
@@ -149,7 +153,7 @@ Holm correction across H1, H2, H4 at familywise α = .05 (one-sided tests). A hy
 - Manipulation check: assistant final answer wrong on 100% of planted items and correct on 100% of clean items (by construction; verified).
 
 ### 5.4 Data exclusion
-- **Assistant replies:** a scripted reply must end with the target answer and contain none of the leak words listed in `prompts.py`. After 4 failed attempts the item is excluded for that assistant only.
+- **Assistant replies:** a scripted reply must end with the target answer, contain none of the leak words listed in `prompts.py`, and have the fixed shape (6 numbered steps, 450 to 800 characters). After 6 failed attempts the item is excluded for that assistant only.
 - **Solvers (gate G2, collapse):** a solver is excluded if it gives the same answer on more than 90% of the items in any multiple-choice family (it is not reasoning).
 - **Solvers (gate G3):** a solver is excluded if, after retries, more than 10% of its trials fail at the API level, or more than 20% of its answers in any task family cannot be parsed. Excluded solvers are reported and not replaced. If fewer than 20 models remain, results are reported as underpowered.
 - No outlier exclusion on scores.

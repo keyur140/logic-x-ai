@@ -158,3 +158,19 @@ def test_thinking_models_are_pooled(tmp_path, monkeypatch):
     t = sl[sl["solver"] == "mock-solver-03"]
     assert list(t["mode"]) == ["pooled"] and int(t["thinking"].iloc[0]) == 1
     assert (sl[sl["solver"] != "mock-solver-03"]["mode"] != "pooled").all()
+
+
+def test_scripted_reply_format_band():
+    from logicxai.assistant import _format_problem
+    good = "\n".join(f"{i}. " + "Statement %d gives the next fact in the chain of rules." % i
+                     for i in range(1, 7)) + "\n" + "x" * 120 + "\nFINAL: TRUE"
+    assert _format_problem(good) is None
+    assert _format_problem("1. a\n2. b\nFINAL: TRUE").startswith("format")
+    assert _format_problem(good.replace("6. ", "six ")).startswith("format: 5 steps")
+
+
+def test_hidden_reasoning_is_stripped():
+    text, thought = LLM.strip_thoughts("<thought>FINAL: FALSE draft</thought>\nFINAL: TRUE")
+    assert text == "FINAL: TRUE" and "draft" in thought
+    text, thought = LLM.strip_thoughts("<thought>cut off while thinking FINAL: 3")
+    assert text == "" and parse_int(text) is None
