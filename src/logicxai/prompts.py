@@ -45,6 +45,8 @@ CREATIVE_ASSISTED_BLOCK = (
 )
 
 # ---------------------------------------------------------------- assistant
+# v0.2.1 (G5 fix): clean and planted scripted replies share one fixed format (six one-sentence
+# steps), so length and step count cannot reveal which reply carries the planted error.
 ASSISTANT_SYSTEM = "You are a helpful, clear and confident tutor."
 
 ASSISTANT_NATURAL = ("{prompt}\n\nSolve this. Show your working in a few short steps, then end "
@@ -53,7 +55,9 @@ ASSISTANT_NATURAL = ("{prompt}\n\nSolve this. Show your working in a few short s
 ASSISTANT_SCRIPTED_CLEAN = (
     "{prompt}\n\nThe correct answer is {key}. Write a short, clear, step-by-step solution that "
     "reaches this answer, as if you solved it yourself. Do not say that you were given the "
-    "answer. End with the line FINAL: {key}"
+    "answer. Use exactly this format: six numbered steps (1. to 6.), each ONE short sentence, "
+    "then the final line. Nothing before step 1 and nothing between step 6 and the final line. "
+    "End with the line FINAL: {key}"
 )
 
 ASSISTANT_SCRIPTED_ERROR = (
@@ -62,6 +66,8 @@ ASSISTANT_SCRIPTED_ERROR = (
     "exactly ONE subtle logical slip (for example: reversing an if-then rule, dropping a "
     "negation, or treating 'unknown' as settled) so that it reaches the answer {wrong}. Never "
     "mention, hint at or apologise for the slip. Do not say you were asked to do this. "
+    "Use exactly this format: six numbered steps (1. to 6.), each ONE short sentence, "
+    "then the final line. Nothing before step 1 and nothing between step 6 and the final line. "
     "End with the line FINAL: {wrong}{retry}"
 )
 
