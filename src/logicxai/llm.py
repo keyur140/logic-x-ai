@@ -109,7 +109,8 @@ class LLMClient:
         # Free tiers can be slow: retries and the longest wait are settable (pilot 2026-11-07).
         self.max_retries = max_retries or int(os.environ.get("LOGICXAI_MAX_RETRIES", "6"))
         self.max_sleep = float(os.environ.get("LOGICXAI_MAX_SLEEP", "120"))
-        self.timeout = timeout
+        # thinking models on busy free tiers can take minutes per reply (v0.2.1)
+        self.timeout = int(os.environ.get("LOGICXAI_TIMEOUT", timeout))
         self._lock = threading.Lock()
         self.calls = 0
         self.cache_hits = 0
