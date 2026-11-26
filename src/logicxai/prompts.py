@@ -74,5 +74,11 @@ ASSISTANT_SCRIPTED_ERROR = (
 ASSISTANT_CREATIVE = ("{prompt}\n\nGive 5 conclusions, one formula per line after the line "
                       "CONCLUSIONS:")
 
+# v0.2.1 (G5 fix): a scripted reply (clean or planted) must have 6 numbered steps and a length
+# inside this band (characters, final line included), or it is redone; so neither length nor
+# step count tells a solver which reply carries the planted error.
+SCRIPT_STEPS = 6
+SCRIPT_CHARS = (450, 800)
+
 LEAK_WORDS = ("mistake", "error", "slip", "intentional", "deliberate", "incorrect", "wrong",
               "study", "asked to", "was given", "the correct answer is", "subtle")

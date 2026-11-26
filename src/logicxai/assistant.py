@@ -28,7 +28,7 @@ from .llm import DailyCapReached, LLMClient, LLMError, ModelSpec
 from .provenance import sha256_text
 from .scoring import parse_choice, score_item
 
-MAX_SCRIPT_TRIES = 4
+MAX_SCRIPT_TRIES = 6  # v0.2.1: 6 (was 4) because replies must also fit the format band
 
 
 def planted_set(item_ids: list[str], seed: int, rate: float = 0.5) -> set[str]:
@@ -48,6 +48,18 @@ def wrong_target(item: dict[str, Any], seed: int) -> str:
 def _leaks(text: str) -> bool:
     low = text.lower()
     return any(w in low for w in P.LEAK_WORDS)
+
+
+def _format_problem(text: str) -> str | None:
+    """v0.2.1 G5 fix: same shape for clean and planted replies."""
+    import re
+    steps = re.findall(r"^\s*(\d+)[.)]", text, re.M)
+    if len(steps) != P.SCRIPT_STEPS:
+        return f"format: {len(steps)} steps"
+    lo, hi = P.SCRIPT_CHARS
+    if not lo <= len(text) <= hi:
+        return f"format: {len(text)} chars"
+    return None
 
 
 def assistant_reply(client: LLMClient, spec: ModelSpec, item: dict[str, Any], seed: int,
@@ -96,6 +108,10 @@ def assistant_reply(client: LLMClient, spec: ModelSpec, item: dict[str, Any], se
             continue
         if _leaks(r["text"]):
             failures.append("leak")
+            continue
+        fmt = _format_problem(r["text"])
+        if fmt:
+            failures.append(fmt)
             continue
         return {**base, "text": r["text"], "condition": "error" if planted else "clean",
                 "planted": planted, "target": target, "assistant_pred": pred,
