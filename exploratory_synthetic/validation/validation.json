@@ -1,6 +1,6 @@
 {
   "what": "Pipeline validation on synthetic data. Not study results.",
-  "created_utc": "2026-11-05T19:36:23+00:00",
+  "created_utc": "2026-11-26T13:54:56+00:00",
   "sims_per_world": 2000,
   "alpha": 0.05,
   "bound_pp": 5.0,
@@ -167,14 +167,14 @@
   ],
   "pipeline_runs": {
     "mock": {
-      "run": "20261105T193029Z-201ab2e1-mock",
+      "run": "20261126T134710Z-c4839993-mock",
       "world": "amplify",
       "confirmatory": {
         "H1": {
-          "p_raw": 0.0575,
-          "p_holm": 0.0575,
+          "p_raw": 0.0948,
+          "p_holm": 0.0948,
           "supported": false,
-          "estimate_pp_per_sd": 4.679902129495851,
+          "estimate_pp_per_sd": 4.231335533707279,
           "labels": [],
           "interpretable": true
         },
@@ -188,10 +188,10 @@
           "interpretable": true
         },
         "H4": {
-          "p_raw": 0.0044,
-          "p_holm": 0.0088,
+          "p_raw": 0.0026,
+          "p_holm": 0.0052,
           "supported": true,
-          "indirect": 17.81155385133216,
+          "indirect": 20.810779476674675,
           "labels": [],
           "interpretable": true
         }
@@ -214,14 +214,14 @@
       "excluded_units": 3
     },
     "mock_null": {
-      "run": "20261105T193237Z-0da35171-mock_null",
+      "run": "20261126T135001Z-4d32a46a-mock_null",
       "world": "null",
       "confirmatory": {
         "H1": {
           "p_raw": 1.0,
           "p_holm": 1.0,
           "supported": false,
-          "estimate_pp_per_sd": -12.927809427931003,
+          "estimate_pp_per_sd": -12.72990640240918,
           "labels": [],
           "interpretable": true
         },
@@ -235,10 +235,10 @@
           "interpretable": true
         },
         "H4": {
-          "p_raw": 0.9488,
+          "p_raw": 0.8978,
           "p_holm": 1.0,
           "supported": false,
-          "indirect": -2.0471184518944043,
+          "indirect": -2.540242559155741,
           "labels": [],
           "interpretable": true
         }

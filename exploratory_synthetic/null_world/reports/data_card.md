@@ -1,4 +1,4 @@
-# Data card: Logic × AI run 20261105T193237Z-0da35171-mock_null
+# Data card: Logic × AI run 20261126T135001Z-4d32a46a-mock_null
 
 > TEST RUN with simulated models. Not study data.
 
