@@ -77,10 +77,10 @@ story = [
     figure(FIG / "design.png", "Figure 1. Each solver is tested alone and with the AI helper on the same items. "
            "Hard items carry a planted error exactly half the time."),
     table([["Element", "Choice (each one the author's decision)"],
-           ["Solvers", "28 free open models × 3 thinking modes (direct, brief, careful) = 84 solvers, clustered by model"],
+           ["Solvers", "28 free open models × 3 thinking modes (direct, brief, careful); 2 always-thinking models pooled = 80 solver units, clustered by model"],
            ["Logic score", "Syllogisms (120), conditional inferences (80), reflection puzzles (30); keys proved by code"],
            ["Tasks", "Easy maths (200 items), hard deduction (300 items, 150 with a planted AI error)"],
-           ["Helper AI", "Llama 3.3 70B (primary), Qwen 2.5 72B (replication)"],
+           ["Helper AI", "gpt-oss-120b (primary), Gemma 4 31B (replication)"],
            ["Controls", "Knowledge (MMLU-style test, 400 items) and log model size"],
            ["Validity links", "FOLIO, LogiQA, GSM8K benchmark subsets (medium size)"],
            ["Access", "Free APIs with Ollama as backup; total cost USD 0"]], [3.2 * cm, 13.4 * cm]),
@@ -90,11 +90,11 @@ story = [
            ["H1", "Amplification: when the helper is wrong, higher logic → bigger AI gain",
             "One-sided slope of AI gain on logic, wild cluster bootstrap"],
            ["H2", "Levelling: on easy maths, logic adds less than +5 points of AI gain per SD",
-            "Non-superiority against +5 pp (TOST reported)"],
+            "Registered secondary: non-superiority against +5 pp, unadjusted"],
            ["H4", "Mechanism: logic → spotting AI errors (d′) → AI gain", "Indirect effect, cluster bootstrap"],
            ["H3", "Logical creativity → more original conclusions with AI", "Exploratory only"]],
           [1.2 * cm, 8.4 * cm, 7.0 * cm]),
-    P("H1, H2 and H4 form one family with Holm correction (α = .05). AI gain = score with the helper minus score "
+    P("H1 and H4 form the confirmatory family with Holm correction (α = .05); H2 became a registered secondary after the pilot showed it had too little power. AI gain = score with the helper minus score "
       "alone on the same items, adjusted for knowledge and size.", SMALL),
 
     P("Risks and safeguards", H2),
@@ -153,7 +153,7 @@ story = [
     table([["Stage", "What happens", "Cost"],
            ["Pilot", "6 solvers, dev items: timing, parsing, floor and ceiling checks", "USD 0"],
            ["Freeze + OSF", "python -m logicxai freeze, package; register both SHA-256 values", "USD 0"],
-           ["Full run", "84 solvers, registered items; resumable cache; multi-day on free limits", "USD 0"],
+           ["Full run", "80 solver units, registered items; resumable cache; multi-day on free limits", "USD 0"],
            ["Optional", "A rented GPU with Ollama if free limits are too slow", "Depends on provider"]],
           [2.6 * cm, 10.6 * cm, 3.4 * cm]),
 

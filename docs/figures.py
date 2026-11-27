@@ -74,10 +74,10 @@ def design():
     def arrow(x1, y1, x2, y2):
         ax.annotate("", (x2, y2), (x1, y1), arrowprops={"arrowstyle": "-|>", "color": MUTED, "lw": 1})
 
-    b(1, 24, 20, 18, "84 solvers", "28 free open models\n× 3 thinking modes\n(direct, brief, careful)")
+    b(1, 24, 20, 18, "80 solver units", "28 free open models\n× 3 thinking modes\n(2 thinking models pooled)")
     b(26, 24, 22, 18, "1. Logic score", "Solve alone:\nsyllogisms, conditionals,\nreflection puzzles\n(keys proved by code)")
     b(53, 24, 22, 18, "2. Solve alone", "Easy maths\nHard deduction\n(same items as step 3)")
-    b(80, 24, 19, 18, "3. Solve with AI", "Llama 3.3 70B helper\n(Qwen 2.5 72B replication)\nflags: ASSISTANT_ERROR")
+    b(80, 24, 19, 18, "3. Solve with AI", "gpt-oss-120b helper\n(Gemma 4 31B replication)\nflags: ASSISTANT_ERROR")
     for x1, x2 in ((21.8, 25.4), (48.8, 52.4), (75.8, 79.4)):
         arrow(x1, 33, x2, 33)
     b(80, 1, 19, 17, "Planted errors", "Hard items: exactly 50%\nhave a wrong AI answer\n(checked by SAT solver)",

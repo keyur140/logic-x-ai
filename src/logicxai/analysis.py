@@ -8,7 +8,7 @@
 
 """Preregistered analysis.
 
-Unit of analysis = solver (one open model in one reasoning mode; 28 x 3 = 84).
+Unit of analysis = solver unit (one open model in one reasoning mode; always-thinking models pooled into one unit: 26 x 3 + 2 = 80).
 Cluster = model (28), because the three modes of one model are not independent.
 
 Confirmatory family (Holm-corrected, one-sided): H1 and H4.

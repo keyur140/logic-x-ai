@@ -10,7 +10,7 @@
     ],
     "note": "Conducted independently; not an official Brunel University London project."
   },
-  "frozen_utc": "2026-11-27T15:00:39+00:00",
+  "frozen_utc": "2026-11-27T15:03:11+00:00",
   "registered_seed": 20261026,
   "dev_seed": 7110526,
   "files": {
@@ -25,11 +25,11 @@
     "README.md": "bd92ae91c3e8fe863cdefee5c8cf4ed619b73b65acac58744d2e10e5ce39827a",
     "configs/pilot_groq.yaml": "4179a009f022b3a10f1eb50ef3b6c8256826e917e2f7a0b1bbdf3655ab4af1c3",
     "configs/study.yaml": "ab362db501418ef58372581c4f4a34de8537b50634d73a82cbe9380630eefe5b",
-    "docs/Exploratory_Report_SYNTHETIC.pdf": "11b318793a936ae81d92ac5ce9253c8cbb136ab6d1818a5a94db2d93c5349e72",
-    "docs/Impact_and_Recognition.pdf": "6a60fb1d2c1e950fa8a76ee7ece40ac8894e39b800c438d070fd05b0c6b4689f",
-    "docs/Project_Brief.pdf": "a90e612e326b156ac849e300d089645238b1addb5dd20cc6432b860bcb54b51a",
+    "docs/Exploratory_Report_SYNTHETIC.pdf": "2deecd7645d495990615059a237144f1cb295cad22d97f1f70b44fb47e399899",
+    "docs/Impact_and_Recognition.pdf": "c3fbda88241aa0e16ca788b364222235a5da1f6c7477e88d203a58b5c8d05081",
+    "docs/Project_Brief.pdf": "6f61af11312e36d72e5352afc1a58aa10713d854911886022ea089218d8f3747",
     "docs/Repilot_Report_v021.pdf": "36821df99329cec7a5ae557e1a7885afb213ccc295901bf7c780812369dea0c7",
-    "docs/figures/design.png": "cc62a9c1bb21c7e219623024de640b2e683c0e8e64c910dc6a4e0605122df87e",
+    "docs/figures/design.png": "cf73fe39c8159ff1d5d8aa55f7274cf9c37aa76c97231da8ee30f72c0e4f2c99",
     "docs/figures/forest.png": "7051c4a6dee1e68a264caa649fa53cd25f36fb24d526739fae38fe1053e5ba03",
     "docs/figures/gate_g6.png": "10bf0b04f985e62e42de39ce37cb2ba3ee0f4a48800de2b54dbc81bb7f6b90aa",
     "docs/figures/h1_scatter.png": "7c0356b4d092bb7258204f36aae8a3ab94e9adb3d0622009c7e59dcd7d60942d",
@@ -39,10 +39,10 @@
     "docs/figures/multiverse.png": "d41ffd0b660916a72df32223a70b8c38f2f0cc10487391a244558bb8309303d8",
     "docs/figures/power.png": "d9d42251855aea1fe9768090c06ca84f9286fcffbd0e616992190667c35a9567",
     "docs/figures/validation.png": "a0fa342a461b7a43d07e467539f4e00f09763ee37d1cb9356df2a16c9cfb19e5",
-    "docs/figures.py": "0099fa73beb215d7fd94edd710051e54b40fcf3b2a5d48957403ff9700071dc5",
-    "docs/make_brief.py": "6226b58fd699580e2bee59dd213664dff82f7c1bb9459243487a70a51ae7b52e",
+    "docs/figures.py": "428f261c3233af2bdbff41a2f76802d995d32381bfef2ad51331088bb88770b7",
+    "docs/make_brief.py": "8330480935cc3f41e5ef2a19ef58c2d2cbd46ee857a53c606700dfd777fb45e2",
     "docs/make_exploratory_report.py": "da992072338269b38e89742b3164ed556b0d0fcf3bce9fa3f5ebb38438c3af39",
-    "docs/make_impact_pdf.py": "8eabc1ff1000affff245e6de390d6ad05ae931d0e75a00d923455328117f5ed5",
+    "docs/make_impact_pdf.py": "7de3ba5bcfbb0fa72e57caf59c354e2605b045df09cbe0e7188f296a2ab27a14",
     "docs/make_pilot_report.py": "961429ad5b0687fd458e82e00298361e4cfc8c4991d0998b2ddf39d5e41d0e9e",
     "docs/make_repilot_report.py": "f03a10553d8f4b6f0c399e121025714a94b40738c94e0f64e3bb9fc014ca3ef1",
     "docs/pdfkit.py": "6784075b662331884f78d3503ca7a89807b7ef094a446d93606c7e75d84cd047",
@@ -77,7 +77,7 @@
     "exploratory_synthetic/validation/fig_validation.png": "7db18bd4668a1346a8f3ff433b13bbff07f2f31b7dbac64f7c455f9c299738a2",
     "exploratory_synthetic/validation/validation.json": "4e968f62e5d285282b7fe65abaea3deeb339f55884622318cfc9d00b23ad9d4c",
     "exploratory_synthetic/validation/validation_rates.csv": "fb5fd60db1066fe8f257d6c3203b41dc3e92141cf174dc481ced9467ff6e9f79",
-    "preregistration/PREREGISTRATION.md": "237c66b381dea3bfba350ce4cb3ff4213a96f1e7d5d75d6af4850ca2aa08452f",
+    "preregistration/PREREGISTRATION.md": "f8a64a1c9081caa637697034b04449e13c87471c3350dd429a5c4edb8325f4f3",
     "pyproject.toml": "52ac40c1ff5c0b445af9397e398c07d1b12919ded0d93c3744129df193624409",
     "requirements.txt": "d028cc5597f09c8508fcae663ad73f76924e1b32d028fa2d3920ea3b6c1bd8d8",
     "run.bat": "6c343200c619d835f19ce733e0cab0dbd3abbe5252745849e61ab014e8dc5c1e",
@@ -90,7 +90,7 @@
     "scripts/setup_ollama.py": "768cf24928418af388f12127b646b4804f973f29961d64287a4589a6f4659a8a",
     "src/logicxai/__init__.py": "d43b3a467e5aebae83e4dfc82fe04d90aa6100bcd72d4f4f8a5492e9db9b3ef8",
     "src/logicxai/__main__.py": "d81e1e526987f84cb21caabc990c0d18abac5b9566eddb8a2b95287e68b00728",
-    "src/logicxai/analysis.py": "e80eb51781d72b14e9e2bb89dde0472667cbb2860f1bf1af1852590d6dcb1e31",
+    "src/logicxai/analysis.py": "ac2133fc5c9177f5868df32851fff73784dabea77fb8bafeed53ecd7b966d53f",
     "src/logicxai/assistant.py": "57e469b9d95103fcb68c13d42a2e97df56fa72b3767f2ec8d1c7942d5c381145",
     "src/logicxai/benchmarks.py": "041c91a1f70b975e8e3cdadf48b0dd963399deb26ab8dba28c76faa5f5f5687c",
     "src/logicxai/checks.py": "d39f33326dc23732bf0ca7873edbc8e74bdd4a155835d51fa455584a81799172",
@@ -123,5 +123,5 @@
     "logic_creative": "7aa373feeeb698857ad0e43b78b9e1ad4728212f96393ddc8254f736a85a61d4",
     "catch": "ecdaf9f76e66e81653445a8f5543ce602c593aecaa84bd72aa35fb0c8424f476"
   },
-  "code_sha256": "695722e71c4fd123d9637fb7e709f2bdd37ad0c27456b1fb2b7da845eacc8bb1"
+  "code_sha256": "c126fe3bcc6775daf6f0c3d3ccc8136da082180a6c56a545523515838649f5a4"
 }

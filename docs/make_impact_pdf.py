@@ -144,10 +144,10 @@ story = [
               "design call yourself, choosing among options:", BODY),
     bullets([
         "AI models as the solvers (no humans); free APIs with an offline backup",
-        "H1, H2 and H4 as the main claims, with H3 exploratory",
-        "New generated puzzles plus a medium benchmark set; two helper AIs (Llama and Qwen)",
+        "H1 and H4 as the main claims (H2 moved to a registered secondary after the pilot), with H3 exploratory",
+        "New generated puzzles plus a medium benchmark set; two helper AIs (gpt-oss-120b and Gemma 4 31B, after the first choices were retired)",
         "Errors on exactly half of the hard items; a strict 5-point band for levelling",
-        "84 solvers through thinking styles; knowledge and model size as controls",
+        "80 solver units through thinking styles (2 always-thinking models count once); knowledge and model size as controls",
         "The gain score as the main measure, after the validation showed the adjusted score gives false alarms",
         "A separate development seed with a lock, a collapse rule, and free APIs with an Ollama backup",
     ]),

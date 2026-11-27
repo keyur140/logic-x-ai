@@ -81,13 +81,13 @@ Temperature 0, top-p 1, fixed seed where the provider accepts one, fixed token l
 ## 3. Sampling plan
 
 ### 3.1 Existing data
-Registration takes place **before** any confirmatory data are collected. A pilot (first 6 models, small item counts, **development items only**) is run before registration only to check timings, parsing, and ceiling/floor effects. Pilot data are not used in confirmatory analyses. Before registration the whole pipeline was also run on synthetic (mock) models in a planted-effect world and a no-effect world (§5.9); those outputs are attached as a labelled supplementary file.
+Registration takes place **before** any confirmatory data are collected. A pilot (3 models on the Groq free tier, small item counts, **development items only**; DEVIATIONS_PILOT P1) and a re-pilot of the difficulty levels (4 solver models, 96 hard items) were run before registration only to check timings, parsing, and ceiling/floor effects. Pilot data are not used in confirmatory analyses. Before registration the whole pipeline was also run on synthetic (mock) models in a planted-effect world and a no-effect world (§5.9); those outputs are attached as a labelled supplementary file.
 
 ### 3.2 Data collection procedure
 `python -m logicxai run --profile full --until-done`. Free API tiers limit each key per day; when every key for a model has used its allowance the run pauses and continues later from the cache (several keys may rotate). A pause is not a failure and does not count toward the gate G3 limits. The full list of solver models, assistants, routes and parameter counts is in `configs/study.yaml`.
 
 ### 3.3 Sample size
-- **Solvers:** 28 models × 3 reasoning modes = 84 solvers, clustered in 28 models.
+- **Solvers:** 28 models. 26 models run in 3 reasoning modes (direct, brief, careful) and the 2 always-thinking models (gpt-oss-20b, Gemma 4 26B) are pooled into one unit each: 26 × 3 + 2 = **80 solver units**, clustered in 28 models.
 - **Items:** syllogism 120, conditional 80, CRT 30, easy arithmetic 200, hard deduction 300 (150 planted, 150 clean), logical creativity 40, catch items 24; FOLIO 200, LogiQA 300, GSM8K 300, MMLU 400.
 
 ### 3.4 Sample size rationale
@@ -195,7 +195,7 @@ C1 every reply matches its stored SHA-256; C2 deduction keys recomputed by an in
 
 For H2, when the true slope equals the +5 pp bound, the non-superiority test made the false "levelling" claim 5.8% of the time (CR1 t-test). The ANCOVA's false alarms arise because the solo score is a noisy measure of an ability that the logic score measures more cleanly, so logic picks up the residual (Westfall & Yarkoni, 2016). For this reason the primary outcome was changed from the adjusted score to the gain score **before registration** (logged in `DEVIATIONS.md`).
 
-The full pipeline was also run end to end on 84 synthetic solvers (profiles `mock` and `mock_null`). In the no-effect world H1 and H4 were not supported (as expected). In the planted-effect world H4 was supported (Holm p = .005) and H1 was positive but not significant (+4.2 pp per SD, p = .095). All self-checks passed in both runs.
+The full pipeline was also run end to end on 84 synthetic solver units (28 mock models × 3 modes; mock models have no pooled thinking mode) (profiles `mock` and `mock_null`). In the no-effect world H1 and H4 were not supported (as expected). In the planted-effect world H4 was supported (Holm p = .005) and H1 was positive but not significant (+4.2 pp per SD, p = .095). All self-checks passed in both runs.
 
 ---
 
