@@ -11,15 +11,18 @@
 Unit of analysis = solver (one open model in one reasoning mode; 28 x 3 = 84).
 Cluster = model (28), because the three modes of one model are not independent.
 
-Confirmatory family (Holm-corrected, one-sided):
+Confirmatory family (Holm-corrected, one-sided): H1 and H4.
   H1  amplification   score WITH the assistant on planted-error hard items (pp) ~ logic
                       + solo score on the same items + knowledge (MMLU) + log size     slope > 0
   H2  levelling       score with the assistant on easy items (pp) ~ logic + solo score
                       on the same items + knowledge + log size                         slope < +5 pp
                       (non-superiority; full ±5 pp equivalence (TOST) also reported)
+                      REGISTERED SECONDARY since v0.2.1 (author's decision 25): with pilot
+                      variance its power is too low, so it is reported unadjusted and is
+                      NOT in the Holm family.
   H4  mechanism       logic -> error detection d' -> H1 outcome (same covariates)      indirect > 0
 The plain gain scores (with AI minus alone) are registered secondary analyses S1-S2.
-Primary assistant = first in config (Llama). Second assistant = registered replication.
+Primary assistant = first in config (gpt-oss-120b). Second assistant = registered replication.
 
 Inference: OLS with cluster-robust (CR1) standard errors; p-values from the
 wild cluster restricted bootstrap (Rademacher weights; Cameron, Gelbach & Miller, 2008),
@@ -155,6 +158,9 @@ def mediation(df: pd.DataFrame, x: str, m: str, y: str, covs: list[str], cluster
             "p_one_sided": p, "reps": int(len(boots))}
 
 
+CONFIRMATORY = ("H1", "H4")  # Holm family; H2 is a registered secondary (decision 25)
+
+
 def holm(pvals: dict[str, float]) -> dict[str, float]:
     items = sorted(pvals.items(), key=lambda kv: kv[1])
     m = len(items)
@@ -276,9 +282,14 @@ def run_analysis(scored_dir: str | Path, out_dir: str | Path, st: dict[str, Any]
         raw = {"H1": prim["H1"].get("test", {}).get("p_wild_cluster", 1.0),
                "H2": prim["H2"].get("test", {}).get("p_wild_cluster", 1.0),
                "H4": prim["H4"].get("p_one_sided", 1.0)}
-        adj = holm(raw)
+        # H2 is a registered secondary (decision 25): kept in this table for reporting,
+        # but outside the Holm family and judged on its unadjusted p-value.
+        adj = holm({h: raw[h] for h in CONFIRMATORY})
         res["confirmatory"] = {
-            h: {"p_raw": raw[h], "p_holm": adj[h], "supported": bool(adj[h] < alpha)} for h in raw}
+            h: {"p_raw": raw[h], "p_holm": adj.get(h),
+                "role": "confirmatory" if h in CONFIRMATORY else "registered secondary",
+                "supported": bool((adj[h] if h in CONFIRMATORY else raw[h]) < alpha)} for h in raw}
+        res["holm_family"] = list(CONFIRMATORY)
         res["confirmatory"]["H1"]["estimate_pp_per_sd"] = prim["H1"].get("coef", {}).get("logic_z", {}).get("b")
         res["confirmatory"]["H2"]["estimate_pp_per_sd"] = prim["H2"].get("coef", {}).get("logic_z", {}).get("b")
         res["confirmatory"]["H2"]["equivalent_within_bound"] = prim["H2"].get("equivalent_within_bound")
@@ -342,7 +353,7 @@ def run_analysis(scored_dir: str | Path, out_dir: str | Path, st: dict[str, Any]
         res["_c6"] = {"max_diff": float(max(abs(fit.params["logic_z"] - mine["b"]),
                                             abs(fit.bse["logic_z"] - mine["se"]))),
                       "statsmodels_b": float(fit.params["logic_z"]), "statsmodels_se": float(fit.bse["logic_z"])}
-        keys = ["H1", "H2", "H4"]
+        keys = list(CONFIRMATORY)
         ref = multipletests([res["confirmatory"][k]["p_raw"] for k in keys], method="holm")[1]
         res["_c7"] = float(max(abs(r - res["confirmatory"][k]["p_holm"]) for r, k in zip(ref, keys)))
     except Exception as e:  # reference check must never break the run

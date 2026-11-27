@@ -19,7 +19,7 @@
   - *hard* rule-chain deduction at **4 difficulty levels** (8 to 20 statements; levels 3 and 4 add "either/or" steps), where the assistant makes **one planted, subtle error on exactly half the items of each level** (tests **H1 amplification** and **H4 error-catching**);
   - *logical creativity* (exploratory **H3**): valid and rare conclusions.
 - **Exact scoring:** every answer key is computed by a logic engine (brute-force model checking), so no human or AI judges are needed.
-- **Analysis:** solver-level **AI gain** (score with the AI minus score alone, same items), regressed on logic with knowledge (MMLU), model size and "thinking model" as controls. Clustered by model, with wild cluster bootstrap p-values and Holm correction across H1, H2 and H4. Full plan: [`preregistration/PREREGISTRATION.md`](preregistration/PREREGISTRATION.md).
+- **Analysis:** solver-level **AI gain** (score with the AI minus score alone, same items), regressed on logic with knowledge (MMLU), model size and "thinking model" as controls. Clustered by model, with wild cluster bootstrap p-values and Holm correction across H1 and H4 (H2 is a registered secondary, reported unadjusted, because the pilot showed it has too little power). Full plan: [`preregistration/PREREGISTRATION.md`](preregistration/PREREGISTRATION.md).
 - **Open science:** fixed seeds, temperature 0, every request and response hashed and cached, a run manifest, and `SHA256SUMS.txt` for every run.
 - **Cost: USD 0.** Models up to about 14B run on your own computer with Ollama; larger ones use free API tiers (Groq, Google AI Studio, Mistral). Free tiers limit each key per day, so the run **pauses by itself and continues the next day** from the saved answers. `python -m logicxai plan` estimates the days.
 
@@ -31,7 +31,7 @@
 | "FINAL: Tanya earned $365" was marked unreadable | lenient number reading: last number on the FINAL line |
 | Always-thinking models ignore the mode prompt | `thinking` label: 3 modes pooled into one solver, plus a control |
 | Free keys ran out each day; Llama models retired | key rotation, pause and continue, `plan` command, new model list and assistants |
-| Leak check false alarm, H4 "supported" with 1 model, `check` hung, missing statsmodels | all fixed, each with a test (41 tests) |
+| Leak check false alarm, H4 "supported" with 1 model, `check` hung, missing statsmodels | all fixed, each with a test (42 tests) |
 
 Full list: [`CHANGELOG.md`](CHANGELOG.md) and [`DEVIATIONS.md`](DEVIATIONS.md) (D6 to D12).
 
@@ -73,7 +73,7 @@ Or run the steps one at a time:
 
 ```bash
 pip install -r requirements.txt && pip install -e .
-python -m pytest -q                         # 41 tests: keys, levels, parser, key rotation, freeze, validation
+python -m pytest -q                         # 42 tests: keys, levels, parser, key rotation, freeze, validation
 python -m logicxai run --profile mock_quick # 1-minute offline smoke test with simulated models
 python -m logicxai run --profile mock       # full-size synthetic run, planted-effect world (~3 min)
 python -m logicxai run --profile mock_null  # full-size synthetic run, no-effect world (~3 min)

@@ -174,3 +174,10 @@ def test_hidden_reasoning_is_stripped():
     assert text == "FINAL: TRUE" and "draft" in thought
     text, thought = LLM.strip_thoughts("<thought>cut off while thinking FINAL: 3")
     assert text == "" and parse_int(text) is None
+
+
+def test_h2_is_outside_the_holm_family():
+    from logicxai.analysis import CONFIRMATORY, holm
+    assert CONFIRMATORY == ("H1", "H4")
+    adj = holm({h: p for h, p in {"H1": 0.03, "H4": 0.04}.items()})
+    assert adj["H1"] == pytest.approx(0.06) and adj["H4"] == pytest.approx(0.06)

@@ -49,7 +49,10 @@ def _rows(results: dict[str, Any]) -> list[list[str]]:
     for h in ("H1", "H2", "H4"):
         c = conf.get(h, {})
         est = c.get("estimate_pp_per_sd") if h != "H4" else c.get("indirect")
-        out.append([h, desc[h], _f(est, 2), _f(c.get("p_raw"), 4), _f(c.get("p_holm"), 4), _verdict(h, c)])
+        name = h if c.get("role", "confirmatory") == "confirmatory" else f"{h} (secondary)"
+        out.append([name, desc[h], _f(est, 2), _f(c.get("p_raw"), 4),
+                    _f(c.get("p_holm"), 4) if c.get("p_holm") is not None else "not in Holm family",
+                    _verdict(h, c)])
     return out
 
 

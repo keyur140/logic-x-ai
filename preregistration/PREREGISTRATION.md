@@ -30,15 +30,17 @@ All correct answers are computed by an exact logic engine (brute-force model che
 - **RQ3 (exploratory).** Does logical creativity (generating conclusions that are both valid and rare) predict gains in the originality of AI-assisted work?
 - **RQ4.** Is the logic advantage explained by detecting AI errors?
 
-### 1.3 Hypotheses (confirmatory family: H1, H2, H4)
+### 1.3 Hypotheses (confirmatory family: H1, H4; H2 registered secondary)
 
 | # | Hypothesis | Directional prediction |
 |---|---|---|
 | **H1** Amplification | On hard deduction items where the assistant makes a planted error, higher-logic solvers have a larger **AI gain** (accuracy with the assistant minus accuracy alone, same items). | Slope of logic > 0 |
-| **H2** Levelling | On easy, checkable arithmetic items with a normal assistant, logic adds less than +5 percentage points of AI gain per 1 SD. | Slope of logic < +5 pp (non-superiority) |
+| **H2** Levelling *(registered secondary)* | On easy, checkable arithmetic items with a normal assistant, logic adds less than +5 percentage points of AI gain per 1 SD. | Slope of logic < +5 pp (non-superiority) |
 | **H4** Mechanism | The logic advantage in H1 runs through error detection (signal-detection sensitivity d′ for flagging the assistant's errors). | Indirect effect logic → d′ → H1 outcome > 0 |
 
 H1 and H2 together make the central claim: *logic matters most where the AI cannot be trusted blindly.*
+
+**H2 is a registered secondary hypothesis, not part of the confirmatory family** (author's decision, 2026-11-27, before registration). With the variance seen in the pilot, the ±5 pp test has about 2% power (§3.4), so it cannot carry a confirmatory claim. H2 is still tested exactly as planned in §5.1 and always reported, with its unadjusted p-value and its 90% CI, but it does not enter the Holm correction and the central claim rests on H1 (and H4 for the mechanism). A non-significant H2 result will be described as *inconclusive*, never as evidence against levelling.
 
 H3 (logical creativity → originality gain) is **exploratory**. H5 from the original plan (transfer to unassisted work) is dropped because language models do not learn between independent API calls.
 
@@ -97,7 +99,7 @@ Each run also reports the minimum detectable H1 effect at 80% power from the obs
 
 **Updated with pilot variance (2026-11-26).** The pilot (3 models on Groq, development items) gave larger spreads than assumed: hard-item error gain between-model SD 7 pp, within-model SD 11 pp; easy-item gain between-model SD 15 pp, within-model SD 37 pp (direct-mode easy maths gains of 55 to 90 pp). Re-running the same simulation with these values gives:
 - H1: 52% power at 3 pp per SD, 86% at 5 pp per SD, 99.7% at 8 pp per SD (one-sided α = .05). The study is therefore well powered for H1 effects of 5 pp per SD or more, and under-powered below about 4 pp per SD.
-- H2: the probability that the 90% CI falls within ±5 pp when the true slope is zero is about 2% (60% at ±10 pp, 95% at ±15 pp). With the pilot variance the ±5 pp equivalence test is not informative; how H2 is treated after this result is set in §1.3.
+- H2: the probability that the 90% CI falls within ±5 pp when the true slope is zero is about 2% (60% at ±10 pp, 95% at ±15 pp). With the pilot variance the ±5 pp equivalence test is not informative; H2 is therefore a registered secondary hypothesis (§1.3).
 
 The re-pilot of the difficulty ladder (`docs/Repilot_Report_v021.pdf`) confirmed that levels 3 and 4 pull the strongest pilot models off the ceiling (careful-mode accuracy alone 71% and 50% at level 4), which is what H1 needs.
 
@@ -137,11 +139,11 @@ Data collection stops when every solver has completed every registered trial, or
 Unit = solver unit (n = 80: 26 models × 3 modes + 2 pooled thinking models); cluster = model (28). OLS with cluster-robust (CR1) standard errors. p-values from the wild cluster restricted bootstrap-t (Rademacher weights, 9,999 replications; Cameron, Gelbach & Miller, 2008).
 
 - **H1:** `gain_hard_error ~ logic_z + mmlu_z + logparams_z + thinking`. One-sided test, slope of logic_z > 0.
-- **H2:** `gain_easy ~ logic_z + mmlu_z + logparams_z`. One-sided non-superiority test of H0: slope ≥ +5 against H1: slope < +5. The two one-sided tests against ±5 (TOST) are also reported, to state whether the effect is *equivalent to zero* (both bounds rejected) or *levelling* (CI entirely below 0).
+- **H2 (registered secondary):** `gain_easy ~ logic_z + mmlu_z + logparams_z`. One-sided non-superiority test of H0: slope ≥ +5 against H1: slope < +5. The two one-sided tests against ±5 (TOST) are also reported, to state whether the effect is *equivalent to zero* (both bounds rejected) or *levelling* (CI entirely below 0).
 - **H4:** a-path `dprime_z ~ logic_z + covariates`; b-path `gain_hard_error ~ dprime_z + logic_z + covariates` (covariates as in H1). Indirect effect a × b; one-sided p and percentile CI from a cluster (model) bootstrap with 4,999 resamples.
 
 ### 5.2 Inference criteria
-Holm correction across H1, H2, H4 at familywise α = .05 (one-sided tests). A hypothesis is supported when its Holm-adjusted p < .05. Results with the primary assistant (gpt-oss-120b) decide the hypotheses. The Gemma 4 assistant is a registered replication: a hypothesis "replicates" if the Gemma 4 estimate has the same sign and its unadjusted p < .05.
+Holm correction across H1 and H4 at familywise α = .05 (one-sided tests). A confirmatory hypothesis is supported when its Holm-adjusted p < .05. H2 (registered secondary) is judged on its unadjusted one-sided p < .05 and its 90% CI, outside the Holm family. Results with the primary assistant (gpt-oss-120b) decide the hypotheses. The Gemma 4 assistant is a registered replication: a hypothesis "replicates" if the Gemma 4 estimate has the same sign and its unadjusted p < .05.
 
 ### 5.3 Registered secondary analyses (not in the Holm family)
 - S1–S2: H1 and H2 with adjusted (ANCOVA) scores. Reported as sensitivity analyses, labelled as biased upward when the solo score is noisy (§5.9).
