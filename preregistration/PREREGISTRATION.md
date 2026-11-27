@@ -9,7 +9,7 @@ ORCID: https://orcid.org/0009-0008-5261-043X
   
 *Conducted independently; not an official Brunel University London project.*
 
-**Status:** DRAFT (package v0.2.1). Not yet registered. Steps: (1) run the pilot on development items; (2) fill in the items marked `[TO FILL]`; (3) run `python -m logicxai freeze` and `python -m logicxai package`; (4) paste the freeze SHA-256 and the package SHA-256 into §6.1 and submit on OSF. The code refuses to send the registered items to any model until the freeze status is `MATCHES_FREEZE`.
+**Status:** FROZEN for registration (package v0.2.1). The pilot and re-pilot used development items only. This file is one of the hashed study files, so the freeze and package hashes are given on the OSF registration page and in `freeze/FREEZE.json`, not here. The code refuses to send the registered items to any model unless the freeze status is `MATCHES_FREEZE`.
 
 ---
 
@@ -195,7 +195,7 @@ C1 every reply matches its stored SHA-256; C2 deduction keys recomputed by an in
 
 For H2, when the true slope equals the +5 pp bound, the non-superiority test made the false "levelling" claim 5.8% of the time (CR1 t-test). The ANCOVA's false alarms arise because the solo score is a noisy measure of an ability that the logic score measures more cleanly, so logic picks up the residual (Westfall & Yarkoni, 2016). For this reason the primary outcome was changed from the adjusted score to the gain score **before registration** (logged in `DEVIATIONS.md`).
 
-The full pipeline was also run end to end on 84 synthetic solvers (profiles `mock` and `mock_null`). In the no-effect world H1 and H4 were not supported (as expected). In the planted-effect world H4 was supported (Holm p = .009) and H1 was positive but not significant (+4.7 pp per SD, p = .058). All self-checks passed in both runs.
+The full pipeline was also run end to end on 84 synthetic solvers (profiles `mock` and `mock_null`). In the no-effect world H1 and H4 were not supported (as expected). In the planted-effect world H4 was supported (Holm p = .005) and H1 was positive but not significant (+4.2 pp per SD, p = .095). All self-checks passed in both runs.
 
 ---
 
@@ -204,9 +204,10 @@ The full pipeline was also run end to end on 84 synthetic solvers (profiles `moc
 ### 6.1 Frozen materials (SHA-256)
 `python -m logicxai freeze` writes `freeze/FREEZE.json` with the SHA-256 of every study file (code, config, prompts, tests, scripts, docs, this document, synthetic outputs) and of every registered item file. `python -m logicxai package` builds a byte-reproducible release zip.
 
-- Freeze file SHA-256: `[TO FILL]`
-- Code SHA-256 (hash of all file hashes): `[TO FILL]`
-- Release zip SHA-256: `[TO FILL]`
+The three hashes below cannot be written into this file, because this file is itself hashed. They are stated on the OSF registration page and can be recomputed with `python -m logicxai status`:
+- Freeze file SHA-256 (`freeze/FREEZE.json`)
+- Code SHA-256 (hash of all file hashes)
+- Release zip SHA-256 (`logic-x-ai-study-v0.2.1.zip.sha256`)
 
 Benchmark items are fixed by dataset revision (commit hash) and seed; revisions are pinned in `configs/study.yaml` before the full run.
 
@@ -240,4 +241,4 @@ The research idea, research questions and every main design decision are the aut
 - Simonsohn, U., Simmons, J. P., & Nelson, L. D. (2020). Specification curve analysis. *Nature Human Behaviour, 4*, 1208–1214.
 - Westfall, J., & Yarkoni, T. (2016). Statistically controlling for confounding constructs is harder than you think. *PLoS ONE, 11*(3), e0152719.
 - Doshi, A. R., & Hauser, O. P. (2024). Generative AI enhances individual creativity but reduces the collective diversity of novel content. *Science Advances, 10*(28), eadn5290.
-- Further studies cited in the background (Luchini et al., 2025; Asirvatham et al., 2026; Wu et al., 2026; Teng & Ren, 2026; Lee et al., 2025; Kumar et al., 2025) `[TO FILL: full references after reading the full papers, as planned in the original idea document]`.
+- Background studies (cited only to motivate the questions; no design parameter depends on them): Luchini et al. (2025), PsyArXiv preprint; Asirvatham et al. (2026), CEPR Discussion Paper DP21882; Wu et al. (2026), HCOMP; Teng & Ren (2026), OSF preprint; Lee et al. (2025), CHI 2025; Kumar et al. (2025), CHI 2025. Full bibliographic details will be given in the final report.

@@ -16,11 +16,11 @@ pre{white-space:pre-wrap;font-size:.8rem;background:rgba(127,127,127,.08);paddin
 <h1>Who gains most from AI? Logic × AI run report</h1>
 <p class="muted">KEYUR SHAILESHKUMAR PATEL<br>ORCID: https://orcid.org/0009-0008-5261-043X<br>1) MSc Artificial Intelligence student, Department of Computer Science, Brunel University London, UK<br>2) Independent researcher<br>Conducted independently; not an official Brunel University London project.</p>
 <p class="warn"><b>TEST RUN with simulated (mock) models.</b> These numbers only check the pipeline. They are not study results.</p>
-<p>Run <b>20261126T134710Z-c4839993-mock</b> · profile <b>mock</b> · started 2026-11-26T13:47:10+00:00 ·
+<p>Run <b>20261127T144736Z-fd4a011d-mock</b> · profile <b>mock</b> · started 2026-11-27T14:47:36+00:00 ·
 81 solvers (27 models × reasoning modes) · primary assistant
 <b>mock-assistant-a</b></p>
 <h2>Confirmatory results (preregistered, Holm-corrected)</h2>
-<div class="wrap"><table><tr><th>Hyp.</th><th>Claim</th><th>Estimate</th><th>p (raw)</th><th>p (Holm)</th><th>Verdict</th></tr><tr><td>H1</td><td>Amplification: when the AI makes planted errors, higher-logic solvers gain more (or lose less) from the AI</td><td>4.23</td><td>0.0948</td><td>0.0948</td><td>Not supported</td></tr><tr><td>H2</td><td>Levelling: on easy, checkable tasks logic adds less than +5.0 points per SD to the AI gain</td><td>-9.29</td><td>0.0015</td><td>0.0045</td><td>Supported</td></tr><tr><td>H4</td><td>Mechanism: the logic advantage runs through catching AI errors (d′)</td><td>20.81</td><td>0.0026</td><td>0.0052</td><td>Supported</td></tr></table></div>
+<div class="wrap"><table><tr><th>Hyp.</th><th>Claim</th><th>Estimate</th><th>p (raw)</th><th>p (Holm)</th><th>Verdict</th></tr><tr><td>H1</td><td>Amplification: when the AI makes planted errors, higher-logic solvers gain more (or lose less) from the AI</td><td>4.23</td><td>0.0948</td><td>0.0948</td><td>Not supported</td></tr><tr><td>H2 (secondary)</td><td>Levelling: on easy, checkable tasks logic adds less than +5.0 points per SD to the AI gain</td><td>-9.29</td><td>0.0015</td><td>not in Holm family</td><td>Supported</td></tr><tr><td>H4</td><td>Mechanism: the logic advantage runs through catching AI errors (d′)</td><td>20.81</td><td>0.0026</td><td>0.0052</td><td>Supported</td></tr></table></div>
 <p class="muted">Estimates for H1/H2 are percentage points of AI gain (score with the AI minus score alone,
 same items) per 1 SD of logic score, adjusting for knowledge (MMLU) and model size. H4 is the indirect effect through error-detection d′. p-values: wild cluster
 bootstrap (H1, H2) and cluster bootstrap (H4), clustered by model.</p>
@@ -332,14 +332,14 @@ bootstrap (H1, H2) and cluster bootstrap (H4), clustered by model.</p>
 }</pre>
 <h2>Run provenance</h2>
 <pre>{
-  &quot;run_id&quot;: &quot;20261126T134710Z-c4839993-mock&quot;,
+  &quot;run_id&quot;: &quot;20261127T144736Z-fd4a011d-mock&quot;,
   &quot;package_version&quot;: &quot;0.2.1&quot;,
   &quot;config_sha256&quot;: &quot;ab362db501418ef58372581c4f4a34de8537b50634d73a82cbe9380630eefe5b&quot;,
   &quot;prompts_sha256&quot;: &quot;25bce80054f945106f41e03db20aa2c7b885a52c192861aaed7191680243b5ec&quot;,
   &quot;seed&quot;: 7110526,
-  &quot;started_utc&quot;: &quot;2026-11-26T13:47:10+00:00&quot;,
-  &quot;finished_utc&quot;: &quot;2026-11-26T13:49:59+00:00&quot;,
-  &quot;duration_s&quot;: 168.4
+  &quot;started_utc&quot;: &quot;2026-11-27T14:47:36+00:00&quot;,
+  &quot;finished_utc&quot;: &quot;2026-11-27T14:51:09+00:00&quot;,
+  &quot;duration_s&quot;: 213.1
 }
 Stage hashes:
 {
@@ -451,16 +451,16 @@ Stage hashes:
       &quot;mock-solver-26=mock-26&quot;,
       &quot;mock-solver-27=mock-27&quot;
     ],
-    &quot;sha256&quot;: &quot;6176c1868dc3b62bd454692f61d813a074b8dee37f678537ae32e30499c311a8&quot;
+    &quot;sha256&quot;: &quot;53b2b54353b05861abb8431c0f80dd1c0a0fd36c84807378bb3e4dfa67e53c74&quot;
   },
   &quot;scored&quot;: {
-    &quot;trials&quot;: &quot;548c9a3e66686e279b25fc17560659d7949031035b97aa0dfa8e0ed2fbbba09f&quot;,
-    &quot;solver_level&quot;: &quot;4818ab5c00743e696f58d26f92c0ae66a074aa022d833cd35ec68ce966eee83d&quot;
+    &quot;trials&quot;: &quot;8164cb9afb266fcd37371463c0ec4c1eb014852e3a0bff5a61a9510abf0ccd2d&quot;,
+    &quot;solver_level&quot;: &quot;463e56fba418f6f2ad7d906009ffd11844161e38696b42b892faae5e66f95ec7&quot;
   },
   &quot;analysis&quot;: {
-    &quot;results_sha256&quot;: &quot;b19597fa1ea7de508039fbf71d40286927d528b30f63facc05ba84e76b3c2e5c&quot;
+    &quot;results_sha256&quot;: &quot;43eabd862ac86e7201914336426ca51a18b7c43c66bf1b5085c1ab3a54175a74&quot;
   }
 }</pre>
 <p class="muted">Every file in this run folder is listed with its SHA-256 in SHA256SUMS.txt.
-Check it with: <code>python -m logicxai verify /tmp/claude-0/synth/20261126T134710Z-c4839993-mock</code></p>
+Check it with: <code>python -m logicxai verify /tmp/claude-0/synth/20261127T144736Z-fd4a011d-mock</code></p>
 </body></html>

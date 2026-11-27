@@ -1,6 +1,6 @@
 {
   "what": "Pipeline validation on synthetic data. Not study results.",
-  "created_utc": "2026-11-26T13:54:56+00:00",
+  "created_utc": "2026-11-27T14:57:21+00:00",
   "sims_per_world": 2000,
   "alpha": 0.05,
   "bound_pp": 5.0,
@@ -167,12 +167,13 @@
   ],
   "pipeline_runs": {
     "mock": {
-      "run": "20261126T134710Z-c4839993-mock",
+      "run": "20261127T144736Z-fd4a011d-mock",
       "world": "amplify",
       "confirmatory": {
         "H1": {
           "p_raw": 0.0948,
           "p_holm": 0.0948,
+          "role": "confirmatory",
           "supported": false,
           "estimate_pp_per_sd": 4.231335533707279,
           "labels": [],
@@ -180,7 +181,8 @@
         },
         "H2": {
           "p_raw": 0.0015,
-          "p_holm": 0.0045000000000000005,
+          "p_holm": null,
+          "role": "registered secondary",
           "supported": true,
           "estimate_pp_per_sd": -9.287101490778413,
           "equivalent_within_bound": false,
@@ -190,6 +192,7 @@
         "H4": {
           "p_raw": 0.0026,
           "p_holm": 0.0052,
+          "role": "confirmatory",
           "supported": true,
           "indirect": 20.810779476674675,
           "labels": [],
@@ -214,12 +217,13 @@
       "excluded_units": 3
     },
     "mock_null": {
-      "run": "20261126T135001Z-4d32a46a-mock_null",
+      "run": "20261127T145112Z-c1a1e9f8-mock_null",
       "world": "null",
       "confirmatory": {
         "H1": {
           "p_raw": 1.0,
           "p_holm": 1.0,
+          "role": "confirmatory",
           "supported": false,
           "estimate_pp_per_sd": -12.72990640240918,
           "labels": [],
@@ -227,7 +231,8 @@
         },
         "H2": {
           "p_raw": 0.0015,
-          "p_holm": 0.0045000000000000005,
+          "p_holm": null,
+          "role": "registered secondary",
           "supported": true,
           "estimate_pp_per_sd": -9.287101490778413,
           "equivalent_within_bound": false,
@@ -237,6 +242,7 @@
         "H4": {
           "p_raw": 0.8978,
           "p_holm": 1.0,
+          "role": "confirmatory",
           "supported": false,
           "indirect": -2.540242559155741,
           "labels": [],

@@ -93,7 +93,7 @@ python -m logicxai verify runs/<run id>     # check every file against its SHA-2
 ### Steps to preregister
 
 1. `./run.sh` (tests, offline test, model check, pilot on dev items).
-2. Fill the `[TO FILL]` items in the preregistration with the pilot numbers.
+2. Fill the open items in the preregistration with the pilot numbers (done for v0.2.1).
 3. `python -m logicxai freeze`, then `python -m logicxai package`.
 4. On OSF: upload the preregistration, the zip, and the exploratory report; paste the freeze SHA-256 and the zip SHA-256.
 5. `./run.sh full`. Any later change to a study file makes `status` say `CHANGED_SINCE_FREEZE` and blocks the full run.

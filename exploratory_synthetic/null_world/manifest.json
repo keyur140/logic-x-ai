@@ -1,5 +1,5 @@
 {
-  "run_id": "20261126T135001Z-4d32a46a-mock_null",
+  "run_id": "20261127T145112Z-c1a1e9f8-mock_null",
   "profile": "mock_null",
   "synthetic": true,
   "world": "null",
@@ -13,7 +13,7 @@
     ],
     "note": "Conducted independently; not an official Brunel University London project."
   },
-  "started_utc": "2026-11-26T13:50:01+00:00",
+  "started_utc": "2026-11-27T14:51:12+00:00",
   "route": "mock",
   "config_sha256": "ab362db501418ef58372581c4f4a34de8537b50634d73a82cbe9380630eefe5b",
   "prompts_sha256": "25bce80054f945106f41e03db20aa2c7b885a52c192861aaed7191680243b5ec",
@@ -21,7 +21,7 @@
   "item_set": "dev",
   "freeze": {
     "status": "NOT_FROZEN",
-    "code_sha256_now": "591285b72291ece261d6b3194b267343dbb8db0cf81ce6f6dd029f1cd9376d2c",
+    "code_sha256_now": "2ed8d7b1de31e740d78f3c0d85d676486f016cd9422ad66f6d6b5068c1b5a048",
     "changed": []
   },
   "environment": {
@@ -260,14 +260,14 @@
         "mock-solver-26=mock-26",
         "mock-solver-27=mock-27"
       ],
-      "sha256": "99fc34fa51fd1e75db47acf5e26fbc631b010caa0a38698a24c35778d8756ec8"
+      "sha256": "5d98accd9af35846ec3e65c0de0e386763f6979d037a3d71bdbf12b788e0934e"
     },
     "scored": {
-      "trials": "f2a9c23afe63f2063c782f82355cf1d2ccbb8987a7b75805f1c96be41ee4a473",
-      "solver_level": "68c8cd344656baf905882a3886efb9454edc17937519c921d78613d00880d8d5"
+      "trials": "98f3772c8494456195247ea13af6eaa1dead276b02eff99ebb52d56f549c6cb2",
+      "solver_level": "b9237c70061c16ac44a3d253f8abe2d2794f9bff372a2d043f021361b9d90827"
     },
     "analysis": {
-      "results_sha256": "153258f1e844502bc982341b1270838c7a51c2f1d68bf931d196e6af5bd761fe"
+      "results_sha256": "451b1870ed6b4a587f5ce2cbb4d51eeccc0f1da687843c3bcef971e5d924afb7"
     }
   },
   "gates": {
@@ -797,6 +797,6 @@
       "detail": "36 of 36 known replies read correctly"
     }
   ],
-  "finished_utc": "2026-11-26T13:52:59+00:00",
-  "duration_s": 178.4
+  "finished_utc": "2026-11-27T14:54:48+00:00",
+  "duration_s": 215.9
 }
